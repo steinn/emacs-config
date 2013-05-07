@@ -38,7 +38,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Install packages
-;; (prelude-ensure-module-deps '(...))
+(prelude-ensure-module-deps '(smart-mode-line))
 
 ;; Add all libraries from vendor folder to load path
 (add-subfolders-to-load-path vendor-dir 'load-path)
@@ -55,6 +55,13 @@
 
 ;; Remove scroll bar
 (scroll-bar-mode -1)
+
+(require 'smart-mode-line)
+(add-hook 'after-init-hook 'sml/setup)
+(add-to-list 'sml/replacer-regexp-list '("^~/work/birdcore/" ":work:"))
+(add-to-list 'sml/replacer-regexp-list '("^~/.dotfiles/emacs/emacs.d.symlink" ":ED:"))
+(add-to-list 'sml/replacer-regexp-list '("^~/.dotfiles/" ":DOT:"))
+
 
 ;; Load init.el after loading emacs
 (find-file load-file-name)
