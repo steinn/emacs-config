@@ -28,7 +28,7 @@
 (setq jedi:server-command
       (quote
        ("python2"
-        "/home/steinn/.emacs.d/vendor/prelude/elpa/jedi-20130318.1248/jediepcserver.py"
+        "/home/steinn/.emacs.d/vendor/prelude/elpa/jedi-20130425.1201/jediepcserver.py"
         )))
 (setq jedi:setup-keys t)
 (autoload 'jedi:setup "jedi" nil t)
