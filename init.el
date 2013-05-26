@@ -63,11 +63,11 @@
 (add-to-list 'sml/replacer-regexp-list '("^~/.dotfiles/" ":DOT:"))
 
 ;; Clean modeline even more
-(diminish 'prelude-mode)
-(diminish 'guru-mode)
-(diminish 'flyspell-mode)
-(diminish 'whitespace-mode)
-(diminish 'yas-minor-mode)
+;; (diminish 'prelude-mode)
+;; (diminish 'guru-mode)
+;; (diminish 'flyspell-mode)
+;; (diminish 'whitespace-mode)
+;; (diminish 'yas-minor-mode)
 
 
 ;; Load init.el after loading emacs
