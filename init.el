@@ -26,6 +26,7 @@
 (setq prelude-modules-file (expand-file-name "prelude-modules.el"
                                              root-config-dir))
 
+(add-to-list 'load-path vendor-dir)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;        Load prelude         ;;

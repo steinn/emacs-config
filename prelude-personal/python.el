@@ -3,6 +3,7 @@
 ;;; Code:
 
 (require 'prelude-programming)
+(require 'cython-mode)
 
 (prelude-ensure-module-deps '(epc auto-complete jedi virtualenv))
 
