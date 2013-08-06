@@ -71,6 +71,9 @@
 ;; (diminish 'yas-minor-mode)
 
 
+(setq browse-url-chromium-program "google-chrome"
+      browse-url-firefox-program "")
+
 ;; Load init.el after loading emacs
 (find-file load-file-name)
 
