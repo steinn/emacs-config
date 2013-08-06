@@ -37,6 +37,8 @@
 (setq jedi:setup-keys t)
 (autoload 'jedi:setup "jedi" nil t)
 
+(add-to-list 'which-func-modes 'python-mode)
+
 
 (defun prelude-python-mode-defaults ()
   "Python mode hook."
@@ -44,8 +46,7 @@
   (jedi:setup)
   (auto-complete-mode +1)
   (whitespace-mode +1)
-  (electric-indent-mode -1)
-  (which-function-mode -1)
+  ; (electric-indent-mode -1)
   )
 
 (setq prelude-python-mode-hook 'prelude-python-mode-defaults)
