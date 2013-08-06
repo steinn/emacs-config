@@ -5,8 +5,13 @@
 (require 'prelude-programming)
 (require 'cython-mode)
 
-(prelude-ensure-module-deps '(epc auto-complete jedi virtualenv))
+(prelude-ensure-module-deps '(epc auto-complete jedi virtualenvwrapper))
 
+(setq HOME (file-name-as-directory (getenv "HOME")))
+(setq EHOME (file-name-as-directory (concat HOME ".emacs")))
+
+
+;; Fix ipython shell
 (autoload 'python-mode "python" "Python Mode." t)
 (setq
  python-shell-interpreter "ipython"
@@ -21,18 +26,17 @@
  "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
 
 
-;; Setup jedi (auto-completion)
-(setq jedi:server-args
-      (quote
-       ("--sys-path"
-        "/home/steinn/work/birdcore")))
-(setq jedi:server-command
-      (quote
-       ("python2"
-        "/home/steinn/.emacs.d/vendor/prelude/elpa/jedi-20130621.2057/jediepcserver.py"
-        )))
+(require 'virtualenvwrapper)
+(venv-initialize-interactive-shells)
+(venv-initialize-eshell)
+(setq venv-location (concat HOME ".virtualenvs"))
+
+
+;; Setup Jedi
+;; Requires python packages: jedi and epc
 (setq jedi:setup-keys t)
 (autoload 'jedi:setup "jedi" nil t)
+
 
 (defun prelude-python-mode-defaults ()
   "Python mode hook."
@@ -40,7 +44,6 @@
   (jedi:setup)
   (auto-complete-mode +1)
   (whitespace-mode +1)
-  (virtualenv-minor-mode +1)
   (electric-indent-mode -1)
   (which-function-mode -1)
   )
