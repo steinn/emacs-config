@@ -47,8 +47,9 @@
   (auto-complete-mode +1)
   (whitespace-mode +1)
   ; (electric-indent-mode -1)
+  (hack-local-variables)
+  (venv-workon project-venv-name)
   )
-
 (setq prelude-python-mode-hook 'prelude-python-mode-defaults)
 
 (add-hook 'python-mode-hook (lambda ()
