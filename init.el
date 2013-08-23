@@ -59,9 +59,11 @@
 
 (require 'smart-mode-line)
 (add-hook 'after-init-hook 'sml/setup)
-(add-to-list 'sml/replacer-regexp-list '("^~/work/birdcore/" ":work:"))
+(add-to-list 'sml/replacer-regexp-list '("^~/birdcore/" ":RSNT:"))
+(add-to-list 'sml/replacer-regexp-list '("^~/work/birdcore/" ":RSNT:"))
 (add-to-list 'sml/replacer-regexp-list '("^~/.dotfiles/emacs/emacs.d.symlink" ":ED:"))
 (add-to-list 'sml/replacer-regexp-list '("^~/.dotfiles/" ":DOT:"))
+(add-to-list 'sml/replacer-regexp-list '("^/ssh:\\(.*\\):" ":SSH:\\1:"))
 
 ;; Clean modeline even more
 ;; (diminish 'prelude-mode)
