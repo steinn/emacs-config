@@ -76,6 +76,13 @@
 (setq browse-url-chromium-program "google-chrome"
       browse-url-firefox-program "")
 
+;; Unbind Pesky Sleep Button
+(global-unset-key [(control z)])
+(global-unset-key [(control x)(control z)])
+
+;; Confirm on exit
+(setq confirm-kill-emacs 'yes-or-no-p)
+
 ;; Load init.el after loading emacs
 (find-file load-file-name)
 
