@@ -72,7 +72,6 @@
 ;; (diminish 'whitespace-mode)
 ;; (diminish 'yas-minor-mode)
 
-
 (setq browse-url-chromium-program "google-chrome"
       browse-url-firefox-program "")
 
@@ -84,6 +83,6 @@
 (setq confirm-kill-emacs 'yes-or-no-p)
 
 ;; Load init.el after loading emacs
-(find-file load-file-name)
+(find-file "~/org/refile.org")
 
 ;;; init.el ends here
