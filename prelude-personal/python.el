@@ -37,8 +37,11 @@
 (setq jedi:setup-keys t)
 (autoload 'jedi:setup "jedi" nil t)
 
-(add-to-list 'which-func-modes 'python-mode)
+;(add-to-list 'which-func-modes 'python-mode)
 
+(require 'nose)
+
+(setq project-venv-name "base")
 
 (defun prelude-python-mode-defaults ()
   "Python mode hook."
@@ -49,6 +52,13 @@
   ; (electric-indent-mode -1)
   (hack-local-variables)
   (venv-workon project-venv-name)
+  (setq nose-global-name (concat venv-current-dir "bin/nosetests"))
+  (local-set-key "\C-c\C-ta" 'nosetests-all)
+  (local-set-key "\C-c\C-tm" 'nosetests-module)
+  (local-set-key "\C-c\C-t." 'nosetests-one)
+  (local-set-key "\C-c\C-tpa" 'nosetests-pdb-all)
+  (local-set-key "\C-c\C-tpm" 'nosetests-pdb-module)
+  (local-set-key "\C-c\C-tp." 'nosetests-pdb-one)
   )
 (setq prelude-python-mode-hook 'prelude-python-mode-defaults)
 
