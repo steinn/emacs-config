@@ -2,9 +2,9 @@
                              "~/org/work"
                              "~/org/personal"))
 
-(setq org-default-notes-file "~/org/new.org")
+(setq org-default-notes-file "~/org/notes.org")
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/org/refile.org" "Todo")
+      '(("t" "Todo" entry (file+headline "~/org/refile.org" "All TODO")
          "* TODO %?\n  %i\n  %a")
         ("m" "Music" entry (file+headline "~/org/music.org" "New")
          "* TODO %?\n  %i\n  %a")))
