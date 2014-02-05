@@ -86,6 +86,17 @@
 ;; Confirm on exit
 (setq confirm-kill-emacs 'yes-or-no-p)
 
+;; Modify PATH and exec-path so that emacs will find extra binaries
+(expand-file-name "~/.virtualenvs/")
+(add-to-list 'exec-path (expand-file-name "~/.local/bin"))
+(add-to-list 'exec-path (expand-file-name "~/local/bin"))
+(add-to-list 'exec-path (expand-file-name "~/.dotfiles/bin"))
+(setenv "PATH"
+        (concat (expand-file-name "~/.local/bin") ";"
+                (expand-file-name "~/local/bin") ";"
+                (expand-file-name "~/.dotfiles/bin") ";"
+                (getenv "PATH")))
+
 ;; Load init.el after loading emacs
 (find-file "~/org/refile.org")
 
