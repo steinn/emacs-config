@@ -53,8 +53,8 @@
 (add-subfolders-to-load-path themes-dir 'custom-theme-load-path)
 
 ;; Load color theme
-(disable-theme 'zenburn)
-(load-theme 'solarized-dark t)
+;(disable-theme 'zenburn)
+;(load-theme 'solarized-dark t)
 
 ;; Resize fringe back to normal size
 (fringe-mode 8)
