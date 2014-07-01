@@ -28,3 +28,9 @@
 
 ; Use the current window for indirect buffer display
 (setq org-indirect-buffer-display 'current-window)
+
+; Load python language for src blocks.
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)))
