@@ -5,7 +5,7 @@
 (require 'prelude-programming)
 (require 'cython-mode)
 
-(prelude-ensure-module-deps '(epc auto-complete jedi virtualenvwrapper pytest))
+(prelude-ensure-module-deps '(epc auto-complete jedi virtualenvwrapper))
 
 ;; (when (featurep 'python) (unload-feature 'python t))
 ;; (require 'python-mode)
@@ -35,7 +35,7 @@
 ;; (venv-initialize-interactive-shells)
 ;; (venv-initialize-eshell)
 ;; (setq venv-location (expand-file-name "~/.virtualenvs/"))
-(require 'pyvenv)
+;(require 'pyvenv)
 
 ;; Setup Jedi
 ;; Requires python packages: jedi and epc
@@ -70,9 +70,9 @@
 
 (require 'nose)
 
-(require 'pytest)
-(setq pytest-global-name "py.test")
-(setq pytest-cmd-flags "-x -v")
+;; (require 'pytest)
+;; (setq pytest-global-name "py.test")
+;; (setq pytest-cmd-flags "-x -v")
 
 ;; Set project-venv-name in .dir-locals to automatically
 ;; switch to the venv name
