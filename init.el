@@ -52,6 +52,9 @@
 ;; Add all themes from themes folder to custom-theme-load-path
 (add-subfolders-to-load-path themes-dir 'custom-theme-load-path)
 
+(setq ring-bell-function 'ignore)
+(require 'prelude-helm-everywhere)
+
 ;; Load color theme
 ;(disable-theme 'zenburn)
 ;(load-theme 'solarized-dark t)
@@ -60,7 +63,9 @@
 (fringe-mode 8)
 
 ;; Remove scroll bar
-(scroll-bar-mode -1)
+(if (boundp 'scroll-bar-mode)
+    (scroll-bar-mode -1))
+
 
 (require 'smart-mode-line)
 (add-hook 'after-init-hook 'sml/setup)
@@ -68,6 +73,9 @@
 (add-to-list 'sml/replacer-regexp-list '("^~/resonata/" ":RSNT:"))
 (add-to-list 'sml/replacer-regexp-list '("^~/.dotfiles/" ":DOT:"))
 (add-to-list 'sml/replacer-regexp-list '("^/ssh:\\(.*\\):" ":SSH:\\1:"))
+
+;; (require 'magit-gh-pulls)
+;; (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls)
 
 ;; Clean modeline even more
 ;; (diminish 'prelude-mode)
