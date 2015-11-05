@@ -105,6 +105,77 @@
                 (expand-file-name "~/.dotfiles/bin") ";"
                 (getenv "PATH")))
 
+
+
+;; (eval-after-load 'eclim-mode
+;;   '(define-key eclim-mode-map (kbd "M-.") 'eclim-java-find-declaration))
+
+(require 'eclim)
+(require 'eclim-java)
+(require 'eclim-maven)
+(global-eclim-mode)
+(custom-set-variables
+ '(eclim-eclipse-dirs '("~/java/eclipse"))
+ '(eclim-executable "~/java/eclipse/eclim"))
+
+(require 'ac-emacs-eclim-source)
+(ac-emacs-eclim-config)
+(setq help-at-pt-display-when-idle t)
+(setq help-at-pt-timer-delay 0.1)
+(help-at-pt-set-timer)
+
+
+(defvar eclim--marker-ring-length 16
+  "Length of marker ring for eclim navigation.")
+
+(defvar eclim--marker-ring
+  (make-ring eclim--marker-ring-length)
+  "Marker ring that stores eclim navigation.")
+
+(defun eclim-navigation-push-marker ()
+  "Push point onto navigation marker ring."
+  (ring-insert eclim--marker-ring (point-marker)))
+
+(defun eclim-navigation-pop-marker ()
+  "Goto previous point in navigation marker ring."
+  (interactive)
+  (if (ring-empty-p eclim--marker-ring)
+      (error "Eclim marker ring is empty, can't pop")
+    (let ((marker (ring-remove eclim--marker-ring 0)))
+      (switch-to-buffer (or (marker-buffer marker)
+                            (error "Buffer has been deleted")))
+      (goto-char (marker-position marker))
+      ;; Cleanup the marker so as to avoid them piling up.
+      (set-marker marker nil nil))))
+
+
+(defadvice eclim-java-find-declaration (before goto-marker activate)
+  "Find declartion and push marker."
+  (eclim-navigation-push-marker))
+
+(define-key eclim-mode-map (kbd "M-.") 'eclim-java-find-declaration)
+(define-key eclim-mode-map (kbd "M-,") 'eclim-navigation-pop-marker)
+(define-key eclim-mode-map (kbd "M-?")
+  'eclim-java-show-documentation-for-current-element)
+(define-key eclim-mode-map (kbd "C-c C-e m") 'eclim-run-class)
+
+
+(eval-after-load "python"
+  '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
+(add-hook 'jedi-mode-hook 'jedi-direx:setup)
+
+
+(require 'ob-ipython)
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
+(setq org-src-fontify-natively t)
+
+(add-to-list 'org-structure-template-alist
+             '("p" "#+BEGIN_SRC ipython :session ?\n\n#+END_SRC" "<src lang=\"?\">\n\n</src>"))
+(add-to-list 'org-structure-template-alist
+             '("P" "#+BEGIN_SRC ipython :session :file /tmp/tmp.png :exports both ?\n\n#+END_SRC" "<src lang=\"?\">\n\n</src>"))
+
+(setq-default major-mode 'org-mode)
+
 ;; Load init.el after loading emacs
 (find-file "~/org/refile.org")
 

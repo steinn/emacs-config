@@ -10,11 +10,16 @@
  '(cursor-color "#657b83")
  '(custom-safe-themes
    (quote
-    ("146d24de1bb61ddfa64062c29b5ff57065552a7c4019bee5d869e938782dfc2a" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" "9370aeac615012366188359cb05011aea721c73e1cb194798bc18576025cabeb" "e16a771a13a202ee6e276d06098bc77f008b73bbac4d526f160faa2d76c1dd0e" "fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default)))
+    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "146d24de1bb61ddfa64062c29b5ff57065552a7c4019bee5d869e938782dfc2a" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" "9370aeac615012366188359cb05011aea721c73e1cb194798bc18576025cabeb" "e16a771a13a202ee6e276d06098bc77f008b73bbac4d526f160faa2d76c1dd0e" "fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default)))
+ '(eclim-eclipse-dirs (quote ("~/java/eclipse")))
+ '(eclim-executable "~/java/eclipse/eclim")
  '(ediff-merge-split-window-function (quote split-window-vertically))
  '(ediff-split-window-function (quote split-window-horizontally))
  '(fci-rule-color "#383838")
  '(foreground-color "#657b83")
+ '(helm-ff-skip-boring-files t)
+ '(magit-revert-buffers t)
+ '(org-confirm-babel-evaluate nil)
  '(org-link-frame-setup
    (quote
     ((vm . vm-visit-folder-other-frame)
@@ -24,7 +29,8 @@
      (wl . wl-other-frame))))
  '(safe-local-variable-values
    (quote
-    ((project-venv-name . "mailpile")
+    ((encoding . utf-8)
+     (project-venv-name . "mailpile")
      (project-venv-name . "birdcore")
      (virtualenv-default-directory . "/home/steinn/work/birdcore")
      (python-run-file . "/home/steinn/work/birdcore/special/steinn/emacs_shell.py")
