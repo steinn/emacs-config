@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+#name: // scalastyle:ignore
+# key: ssi
+# --
+// scalastyle:ignore
