@@ -103,8 +103,10 @@
         (concat (expand-file-name "~/.local/bin") ";"
                 (expand-file-name "~/local/bin") ";"
                 (expand-file-name "~/.dotfiles/bin") ";"
+                (expand-file-name "~/go/bin") ";"
                 (getenv "PATH")))
 
+(setenv "GOPATH" (expand-file-name "~/go"))
 
 
 ;; (eval-after-load 'eclim-mode
@@ -176,7 +178,36 @@
 
 (setq-default major-mode 'org-mode)
 
+
+;; configure eshell
+(require 'eshell-z)
+(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+
+(require 'yasnippet)
+(yas-reload-all)
+(add-hook 'prog-mode-hook #'yas-minor-mode)
+(add-to-list 'yas-snippet-dirs "~/.emacs.d/vendor/yasnippet-snippets")
+
+(setq which-key-popup-type 'side-window)
+(setq which-key-side-window-location 'bottom)
+
+;; (add-to-list 'auto-mode-alist '("BUILD\\'" . python-mode))
+
+(delete-selection-mode 0)
+(global-set-key (kbd "M-i") 'helm-semantic-or-imenu)
+(global-set-key (kbd "C--") 'negative-argument)
+(global-set-key (kbd "M-p") 'ace-window)
+
+;; (global-set-key (kbd "C--") 'text-scale-decrease)
+
+(put 'set-goal-column 'disabled nil)
+
+(require 'etags-select)
+
 ;; Load init.el after loading emacs
 (find-file "~/org/refile.org")
+
+
+
 
 ;;; init.el ends here
