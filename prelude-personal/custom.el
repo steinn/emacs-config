@@ -31,6 +31,9 @@
      (gnus . org-gnus-no-new-news)
      (file . find-file)
      (wl . wl-other-frame))))
+ '(package-selected-packages
+   (quote
+    (zop-to-char zenburn-theme yari yaml-mode window-numbering which-key volatile-highlights virtualenvwrapper undo-tree tle thrift smex smartrep smartparens smart-mode-line slime scala-mode2 ruby-tools rainbow-mode rainbow-delimiters protobuf-mode php-mode ov org-jira operate-on-number ob-ipython nginx-mode move-text markdown-mode magit-gh-pulls lua-mode key-chord json-mode jedi-direx inf-ruby imenu-anywhere ido-ubiquitous helm-projectile helm-descbinds helm-ag guru-mode groovy-mode grizzl gotest god-mode go-projectile gitignore-mode gitconfig-mode git-timemachine gist geiser flycheck flx-ido expand-region etags-select eshell-z ensime elisp-slime-nav easy-kill dockerfile-mode docker discover-my-major diminish diff-hl csv-mode csharp-mode crux company-go cmake-mode browse-kill-ring beacon anzu ack-and-a-half ace-window ace-jump-mode ace-jump-buffer)))
  '(safe-local-variable-values
    (quote
     ((encoding . utf-8)
