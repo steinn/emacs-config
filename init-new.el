@@ -2,6 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 
+
+;; elpa
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
@@ -15,15 +17,15 @@
 (defun require-package (package)
   """refresh package archives, check package presence,
      install if it's not installed and load package"""
-  (if (null (require package nil t))
-      (progn (let* ((ARCHIVES (if (null package-archive-contents)
-                                  (progn (package-refresh-contents)
-                                         package-archive-contents)
-                                package-archive-contents))
-                    (AVAIL (assoc package ARCHIVES)))
-               (if AVAIL
-                   (package-install package)))
-             (require package))))
+     (if (null (require package nil t))
+         (progn (let* ((ARCHIVES (if (null package-archive-contents)
+                                     (progn (package-refresh-contents)
+                                            package-archive-contents)
+                                   package-archive-contents))
+                       (AVAIL (assoc package ARCHIVES)))
+                  (if AVAIL
+                      (package-install package)))
+                (require package))))
 
 ;;
 ;; Misc
@@ -60,8 +62,11 @@
 ;; enable y/n answers
 (fset 'yes-or-no-p 'y-or-n-p)
 
+;; disable tabs for indent
+(setq-default indent-tabs-mode nil)
+
 ;;
-;; Setup external packages
+;; Setup packages 
 ;;
 
 (require-package 'req-package)
@@ -87,7 +92,6 @@
         helm-ff-search-library-in-sexp        t
         helm-ff-file-name-history-use-recentf t))
 
-
 (req-package helm-eshell
   :config
   (add-hook 'eshell-mode-hook
@@ -102,12 +106,24 @@
   (projectile-global-mode)
   (setq projectile-completion-system 'helm))
 
-
-(req-package helm-projectile)
-
 (req-package magit
   :bind (("C-x g" . magit-status)))
-  
+
+(req-package whitespace
+  :config
+  (setq whitespace-line-column 80)
+  (setq whitespace-style '(face tabs empty trailing lines-tail))
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook 'prelude-cleanup-maybe nil t)
+              (whitespace-mode +1)))
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (whitespace-mode +1)
+              (add-hook 'before-save-hook 'prelude-cleanup-maybe nil t)
+              )))
+
 (req-package-finish)
+
 
 (find-file "~/.emacs.d/init-new.el")
