@@ -65,8 +65,20 @@
 ;; disable tabs for indent
 (setq-default indent-tabs-mode nil)
 
+;; Require newline at end of file
+(setq require-final-newline t)
+
+;; Unbind suspend-frame binds
+(global-unset-key (kbd "C-z"))
+(global-unset-key (kbd "C-x C-z"))
+
+(setq load-prefer-newer t)
+
+(defvar init-dir (file-name-directory load-file-name))
+(defvar savefile-dir (expand-file-name "savefile" init-dir))
+
 ;;
-;; Setup packages 
+;; Setup packages
 ;;
 
 (require-package 'req-package)
@@ -115,13 +127,26 @@
   (setq whitespace-style '(face tabs empty trailing lines-tail))
   (add-hook 'prog-mode-hook
             (lambda ()
-              (add-hook 'before-save-hook 'prelude-cleanup-maybe nil t)
+              (add-hook 'before-save-hook #'whitespace-cleanup nil t)
               (whitespace-mode +1)))
   (add-hook 'text-mode-hook
             (lambda ()
               (whitespace-mode +1)
-              (add-hook 'before-save-hook 'prelude-cleanup-maybe nil t)
+              (add-hook 'before-save-hook #'whitespace-cleanup nil t)
               )))
+
+(req-package ace-window
+  :bind (("M-p" . ace-window)))
+
+(req-package winner-mode
+  :config
+  (winner-mode +1))
+
+(req-package windmove
+  :bind (("S-<left>"  . windmove-left)
+         ("S-<right>" . windmove-right)
+         ("S-<up>"    . windmove-up)
+         ("S-<down>"  . windmove-down)))
 
 (req-package-finish)
 
