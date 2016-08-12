@@ -25,10 +25,8 @@
                   (if AVAIL
                       (package-install package)))
                 (require package))))
-;;
-;; Misc
-;;
 
+;; disable tool-bar
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 
@@ -108,7 +106,8 @@
   :bind (("M-x" . helm-M-x)
          ("C-x b" . helm-mini)
          ("C-x C-b" . helm-buffers-list)
-         ("C-x C-f" . helm-find-files))
+         ("C-x C-f" . helm-find-files)
+         ("M-i" . helm-semantic-or-imenu))
   :config
   (helm-mode 1)
   (setq helm-split-window-in-side-p           t
@@ -123,7 +122,7 @@
             (lambda ()
               (eshell-cmpl-initialize)
               (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-              ;; (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)
+              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)
               ))
   (setq eshell-directory-name (expand-file-name "eshell" savefile-dir)))
 
