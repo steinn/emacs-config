@@ -89,6 +89,8 @@
 (defvar init-dir (file-name-directory load-file-name))
 (defvar savefile-dir (expand-file-name "savefile" init-dir))
 
+(setq custom-file (expand-file-name "custom.el" init-dir))
+
 ;;
 ;; Setup packages
 ;;
@@ -216,7 +218,7 @@
 
 (req-package recentf
   :config
-  (setq recentf-save-file (expand-file-name "recentf" prelude-savefile-dir)
+  (setq recentf-save-file (expand-file-name "recentf" savefile-dir)
         recentf-max-saved-items 500
         recentf-max-menu-items 15
         ;; disable recentf-cleanup on Emacs start, because it can cause
@@ -232,7 +234,7 @@
 
 (req-package bookmark
   :config
-  (setq bookmark-default-file (expand-file-name "bookmarks" prelude-savefile-dir)
+  (setq bookmark-default-file (expand-file-name "bookmarks" savefile-dir)
         bookmark-save-flag 1))
 
 (req-package undo-tree
@@ -274,17 +276,3 @@
 (find-file "~/.emacs.d/init.el")
 
 ;;; init-new.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (volatile-highlights flycheck scala-mode undo-tree rainbow-delimiters smartparens ace-window fill-column-indicator magit projectile helm zenburn-theme use-package-chords req-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
