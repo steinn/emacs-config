@@ -72,6 +72,9 @@
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-x C-z"))
 
+;; highlight the current line
+(global-hl-line-mode +1)
+
 (setq load-prefer-newer t)
 
 (defvar init-dir (file-name-directory load-file-name))
@@ -124,7 +127,7 @@
 (req-package whitespace
   :config
   (setq whitespace-line-column 80)
-  (setq whitespace-style '(face tabs empty trailing lines-tail))
+  (setq whitespace-style '(face tabs empty trailing)) ;; lines-tail
   (add-hook 'prog-mode-hook
             (lambda ()
               (add-hook 'before-save-hook #'whitespace-cleanup nil t)
@@ -135,20 +138,108 @@
               (add-hook 'before-save-hook #'whitespace-cleanup nil t)
               )))
 
+(req-package fill-column-indicator
+  :config
+  (setq fci-rule-column 80)
+  (define-globalized-minor-mode
+    global-fci-mode fci-mode (lambda () (fci-mode 1)))
+  (global-fci-mode 1))
+
 (req-package ace-window
   :bind (("M-p" . ace-window)))
 
-(req-package winner-mode
+(req-package winner
   :config
   (winner-mode +1))
 
 (req-package windmove
-  :bind (("S-<left>"  . windmove-left)
-         ("S-<right>" . windmove-right)
-         ("S-<up>"    . windmove-up)
-         ("S-<down>"  . windmove-down)))
+  :bind (("<S-left>"  . windmove-left)
+         ("<S-right>" . windmove-right)
+         ("<S-up>"    . windmove-up)
+         ("<S-down>"  . windmove-down)))
+
+(req-package autorevert
+  :config
+  (global-auto-revert-mode t))
+
+
+(req-package smartparens
+  :config
+  (require 'smartparens-config)
+  (setq sp-base-key-bindings 'paredit)
+  (setq sp-autoskip-closing-pair 'always)
+  (setq sp-hybrid-kill-entire-symbol nil)
+  (sp-use-paredit-bindings)
+  (show-smartparens-global-mode +1)
+  (add-hook 'prog-mode-hook
+            (lambda () (smartparens-mode +1))))
+
+(req-package uniquify
+  :config
+  (setq uniquify-buffer-name-style 'forward)
+  (setq uniquify-separator "/")
+  (setq uniquify-after-kill-buffer-p t)     ; rename after killing uniquified
+  (setq uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
+
+(req-package saveplace
+  :config
+  (setq save-place-file (expand-file-name "saveplace" savefile-dir))
+  (setq-default save-place t))
+
+(req-package savehist
+  :config
+  (setq savehist-additional-variables
+        ;; search entries
+        '(search-ring regexp-search-ring)
+        ;; save every minute
+        savehist-autosave-interval 60
+        ;; keep the home clean
+        savehist-file (expand-file-name "savehist" savefile-dir))
+  (savehist-mode +1))
+
+(req-package recentf
+  :config
+  (setq recentf-save-file (expand-file-name "recentf" prelude-savefile-dir)
+        recentf-max-saved-items 500
+        recentf-max-menu-items 15
+        ;; disable recentf-cleanup on Emacs start, because it can cause
+        ;; problems with remote files
+        recentf-auto-cleanup 'never)
+  (recentf-mode +1))
+
+;; TODO: enable flyspell
+(req-package flyspell
+  :config
+  (setq ispell-program-name "aspell" ; use aspell instead of ispell
+        ispell-extra-args '("--sug-mode=ultra")))
+
+(req-package bookmark
+  :config
+  (setq bookmark-default-file (expand-file-name "bookmarks" prelude-savefile-dir)
+        bookmark-save-flag 1))
+
+(req-package undo-tree
+  :chords (("uu" . undo-tree-visualize))
+  :config
+  (global-undo-tree-mode))
+
+(req-package scala-mode
+  :config
+  (add-hook 'scala-mode-hook
+            (lambda ()
+              (subword-mode +1))))
+
+(req-package which-func
+  :config
+  (which-function-mode 1))
+
+(req-package flycheck
+  :config
+  (add-hook 'prog-mode-hook 'flycheck-mode))
 
 (req-package-finish)
 
 
 (find-file "~/.emacs.d/init-new.el")
+
+;;; init-new.el ends here
