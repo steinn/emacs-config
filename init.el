@@ -2,7 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-
 ;; elpa
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -15,8 +14,8 @@
   (server-start))
 
 (defun require-package (package)
-  """refresh package archives, check package presence,
-     install if it's not installed and load package"""
+  """Refresh package archives, check PACKAGE presence,
+     install if it's not installed and load package."""
      (if (null (require package nil t))
          (progn (let* ((ARCHIVES (if (null package-archive-contents)
                                      (progn (package-refresh-contents)
@@ -26,7 +25,6 @@
                   (if AVAIL
                       (package-install package)))
                 (require package))))
-
 ;;
 ;; Misc
 ;;
@@ -75,7 +73,18 @@
 ;; highlight the current line
 (global-hl-line-mode +1)
 
+;; store all backup and autosave files in the tmp dir
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
+
+;; smart tab behavior - indent or complete
+(setq tab-always-indent 'complete)
 (setq load-prefer-newer t)
+
+;; .zsh file is shell script
+(add-to-list 'auto-mode-alist '("\\.zsh\\'" . shell-script-mode))
 
 (defvar init-dir (file-name-directory load-file-name))
 (defvar savefile-dir (expand-file-name "savefile" init-dir))
@@ -83,7 +92,6 @@
 ;;
 ;; Setup packages
 ;;
-
 (require-package 'req-package)
 
 (req-package use-package-chords
@@ -114,12 +122,15 @@
               (eshell-cmpl-initialize)
               (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
               ;; (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)
-              )))
+              ))
+  (setq eshell-directory-name (expand-file-name "eshell" savefile-dir)))
 
 (req-package projectile
   :config
   (projectile-global-mode)
-  (setq projectile-completion-system 'helm))
+  (setq projectile-completion-system 'helm
+        projectile-known-projects-file (expand-file-name "projectile-bookmarks.eld"
+                                                         savefile-dir)))
 
 (req-package magit
   :bind (("C-x g" . magit-status)))
@@ -225,8 +236,13 @@
         bookmark-save-flag 1))
 
 (req-package undo-tree
+  :diminish undo-tree-mode
   :chords (("uu" . undo-tree-visualize))
   :config
+  ;; autosave the undo-tree history
+  (setq undo-tree-history-directory-alist
+        `((".*" . ,temporary-file-directory)))
+  (setq undo-tree-auto-save-history t)
   (global-undo-tree-mode))
 
 (req-package scala-mode
@@ -243,9 +259,32 @@
   :config
   (add-hook 'prog-mode-hook 'flycheck-mode))
 
+(req-package volatile-highlights
+  :diminish volatile-highlights-mode
+  :config
+  (volatile-highlights-mode t))
+
+(req-package imenu
+  :config
+  (set-default 'imenu-auto-rescan t))
+
 (req-package-finish)
 
 
 (find-file "~/.emacs.d/init.el")
 
 ;;; init-new.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (volatile-highlights flycheck scala-mode undo-tree rainbow-delimiters smartparens ace-window fill-column-indicator magit projectile helm zenburn-theme use-package-chords req-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
