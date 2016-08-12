@@ -3,218 +3,249 @@
 ;;; Code:
 
 
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
+;; elpa
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 (package-initialize)
 
-(setq root-config-dir (file-name-directory load-file-name))
-(setq vendor-dir (expand-file-name "vendor" root-config-dir))
-(setq themes-dir (expand-file-name "themes" root-config-dir))
+;; emacs server
+(require 'server)
+(unless (server-running-p)
+  (server-start))
 
-(defun add-subfolders-to-load-path (parent-dir list-to-add)
-  "Add all first level PARENT-DIR subdirs to the list LIST-TO-ADD."
-  (dolist (f (directory-files parent-dir))
-    (let ((name (expand-file-name f parent-dir)))
-      (when (and (file-directory-p name)
-                 (not (equal f ".."))
-                 (not (equal f ".")))
-        (add-to-list list-to-add name)))))
+(defun require-package (package)
+  """refresh package archives, check package presence,
+     install if it's not installed and load package"""
+     (if (null (require package nil t))
+         (progn (let* ((ARCHIVES (if (null package-archive-contents)
+                                     (progn (package-refresh-contents)
+                                            package-archive-contents)
+                                   package-archive-contents))
+                       (AVAIL (assoc package ARCHIVES)))
+                  (if AVAIL
+                      (package-install package)))
+                (require package))))
 
+;;
+;; Misc
+;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;      configure prelude      ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq prelude-dir (expand-file-name "prelude" vendor-dir))
-(setq prelude-init-file (expand-file-name "init.el" prelude-dir))
-(setq prelude-personal-dir (expand-file-name "prelude-personal"
-                                             root-config-dir))
-(setq prelude-modules-file (expand-file-name "prelude-modules.el"
-                                             root-config-dir))
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
 
-(add-to-list 'load-path vendor-dir)
+;; disable menu-bar
+(menu-bar-mode -1)
 
-(require 'package)
-;; (add-to-list 'package-archives
-;;              '("marmalade" .
-;;                "http://marmalade-repo.org/packages/"))
+;; the blinking cursor is nothing, but an annoyance
+(blink-cursor-mode -1)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;        Load prelude         ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(load prelude-init-file)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Post prelude configuration ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Install packages
-(prelude-ensure-module-deps '(smart-mode-line))
-
-;; Add all libraries from vendor folder to load path
-(add-subfolders-to-load-path vendor-dir 'load-path)
-
-;; Add all themes from themes folder to custom-theme-load-path
-(add-subfolders-to-load-path themes-dir 'custom-theme-load-path)
-
+;; disable the annoying bell ring
 (setq ring-bell-function 'ignore)
-(require 'prelude-helm-everywhere)
 
-;; Load color theme
-;(disable-theme 'zenburn)
-;(load-theme 'solarized-dark t)
+;; disable startup screen
+(setq inhibit-startup-screen t)
 
-;; Resize fringe back to normal size
-(fringe-mode 8)
+;; disable scroll bar
+(scroll-bar-mode -1)
 
-;; Remove scroll bar
-(if (boundp 'scroll-bar-mode)
-    (scroll-bar-mode -1))
+;; nice scrolling
+(setq scroll-margin 0
+      scroll-conservatively 100000
+      scroll-preserve-screen-position 1)
 
+;; mode line settings
+(line-number-mode t)
+(column-number-mode t)
+(size-indication-mode t)
 
-(require 'smart-mode-line)
-(add-hook 'after-init-hook 'sml/setup)
-(sml/setup)
-(add-to-list 'sml/replacer-regexp-list '("^~/resonata/" ":RSNT:"))
-(add-to-list 'sml/replacer-regexp-list '("^~/.dotfiles/" ":DOT:"))
-(add-to-list 'sml/replacer-regexp-list '("^/ssh:\\(.*\\):" ":SSH:\\1:"))
+;; enable y/n answers
+(fset 'yes-or-no-p 'y-or-n-p)
 
-;; (require 'magit-gh-pulls)
-;; (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls)
+;; disable tabs for indent
+(setq-default indent-tabs-mode nil)
 
-;; Clean modeline even more
-;; (diminish 'prelude-mode)
-;; (diminish 'guru-mode)
-;; (diminish 'flyspell-mode)
-;; (diminish 'whitespace-mode)
-;; (diminish 'yas-minor-mode)
+;; Require newline at end of file
+(setq require-final-newline t)
 
-(setq browse-url-chromium-program "google-chrome"
-      browse-url-firefox-program "")
+;; Unbind suspend-frame binds
+(global-unset-key (kbd "C-z"))
+(global-unset-key (kbd "C-x C-z"))
 
-;; Unbind Pesky Sleep Button
-(global-unset-key [(control z)])
-(global-unset-key [(control x)(control z)])
+;; highlight the current line
+(global-hl-line-mode +1)
 
-;; Confirm on exit
-(setq confirm-kill-emacs 'yes-or-no-p)
+(setq load-prefer-newer t)
 
-;; Modify PATH and exec-path so that emacs will find extra binaries
-(expand-file-name "~/.virtualenvs/")
-(add-to-list 'exec-path (expand-file-name "~/.local/bin"))
-(add-to-list 'exec-path (expand-file-name "~/local/bin"))
-(add-to-list 'exec-path (expand-file-name "~/.dotfiles/bin"))
-(setenv "PATH"
-        (concat (expand-file-name "~/.local/bin") ";"
-                (expand-file-name "~/local/bin") ";"
-                (expand-file-name "~/.dotfiles/bin") ";"
-                (expand-file-name "~/go/bin") ";"
-                (getenv "PATH")))
+(defvar init-dir (file-name-directory load-file-name))
+(defvar savefile-dir (expand-file-name "savefile" init-dir))
 
-(setenv "GOPATH" (expand-file-name "~/go"))
+;;
+;; Setup packages
+;;
 
+(require-package 'req-package)
 
-;; (eval-after-load 'eclim-mode
-;;   '(define-key eclim-mode-map (kbd "M-.") 'eclim-java-find-declaration))
+(req-package use-package-chords
+  :config (key-chord-mode 1))
 
-(require 'eclim)
-(require 'eclim-java)
-(require 'eclim-maven)
-(global-eclim-mode)
-(custom-set-variables
- '(eclim-eclipse-dirs '("~/java/eclipse"))
- '(eclim-executable "~/java/eclipse/eclim"))
+(req-package zenburn-theme
+  :config
+  (load-theme 'zenburn t))
 
-(require 'ac-emacs-eclim-source)
-(ac-emacs-eclim-config)
-(setq help-at-pt-display-when-idle t)
-(setq help-at-pt-timer-delay 0.1)
-(help-at-pt-set-timer)
+(req-package helm
+  :chords (("xx"  . helm-M-x))
+  :bind (("M-x" . helm-M-x)
+         ("C-x b" . helm-mini)
+         ("C-x C-b" . helm-buffers-list)
+         ("C-x C-f" . helm-find-files))
+  :config
+  (helm-mode 1)
+  (setq helm-split-window-in-side-p           t
+        helm-buffers-fuzzy-matching           t
+        helm-move-to-line-cycle-in-source     t
+        helm-ff-search-library-in-sexp        t
+        helm-ff-file-name-history-use-recentf t))
 
+(req-package helm-eshell
+  :config
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (eshell-cmpl-initialize)
+              (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
+              ;; (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)
+              )))
 
-(defvar eclim--marker-ring-length 16
-  "Length of marker ring for eclim navigation.")
+(req-package projectile
+  :config
+  (projectile-global-mode)
+  (setq projectile-completion-system 'helm))
 
-(defvar eclim--marker-ring
-  (make-ring eclim--marker-ring-length)
-  "Marker ring that stores eclim navigation.")
+(req-package magit
+  :bind (("C-x g" . magit-status)))
 
-(defun eclim-navigation-push-marker ()
-  "Push point onto navigation marker ring."
-  (ring-insert eclim--marker-ring (point-marker)))
+(req-package whitespace
+  :config
+  (setq whitespace-line-column 80)
+  (setq whitespace-style '(face tabs empty trailing)) ;; lines-tail
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'whitespace-cleanup nil t)
+              (whitespace-mode +1)))
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (whitespace-mode +1)
+              (add-hook 'before-save-hook #'whitespace-cleanup nil t)
+              )))
 
-(defun eclim-navigation-pop-marker ()
-  "Goto previous point in navigation marker ring."
-  (interactive)
-  (if (ring-empty-p eclim--marker-ring)
-      (error "Eclim marker ring is empty, can't pop")
-    (let ((marker (ring-remove eclim--marker-ring 0)))
-      (switch-to-buffer (or (marker-buffer marker)
-                            (error "Buffer has been deleted")))
-      (goto-char (marker-position marker))
-      ;; Cleanup the marker so as to avoid them piling up.
-      (set-marker marker nil nil))))
+(req-package fill-column-indicator
+  :config
+  (setq fci-rule-column 80)
+  (add-hook 'prog-mode-hook
+            (lambda () (fci-mode 1)))
+  (add-hook 'text-mode-hook
+            (lambda () (fci-mode 1))))
 
+(req-package ace-window
+  :bind (("M-p" . ace-window)))
 
-(defadvice eclim-java-find-declaration (before goto-marker activate)
-  "Find declartion and push marker."
-  (eclim-navigation-push-marker))
+(req-package winner
+  :config
+  (winner-mode +1))
 
-(define-key eclim-mode-map (kbd "M-.") 'eclim-java-find-declaration)
-(define-key eclim-mode-map (kbd "M-,") 'eclim-navigation-pop-marker)
-(define-key eclim-mode-map (kbd "M-?")
-  'eclim-java-show-documentation-for-current-element)
-(define-key eclim-mode-map (kbd "C-c C-e m") 'eclim-run-class)
+(req-package windmove
+  :bind (("<S-left>"  . windmove-left)
+         ("<S-right>" . windmove-right)
+         ("<S-up>"    . windmove-up)
+         ("<S-down>"  . windmove-down)))
 
-
-(eval-after-load "python"
-  '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
-(add-hook 'jedi-mode-hook 'jedi-direx:setup)
-
-
-(require 'ob-ipython)
-(add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
-(setq org-src-fontify-natively t)
-
-(add-to-list 'org-structure-template-alist
-             '("p" "#+BEGIN_SRC ipython :session ?\n\n#+END_SRC" "<src lang=\"?\">\n\n</src>"))
-(add-to-list 'org-structure-template-alist
-             '("P" "#+BEGIN_SRC ipython :session :file /tmp/tmp.png :exports both ?\n\n#+END_SRC" "<src lang=\"?\">\n\n</src>"))
-
-(setq-default major-mode 'org-mode)
+(req-package autorevert
+  :config
+  (global-auto-revert-mode t))
 
 
-;; configure eshell
-(require 'eshell-z)
-(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+(req-package smartparens
+  :config
+  (require 'smartparens-config)
+  (setq sp-base-key-bindings 'paredit)
+  (setq sp-autoskip-closing-pair 'always)
+  (setq sp-hybrid-kill-entire-symbol nil)
+  (sp-use-paredit-bindings)
+  (show-smartparens-global-mode +1)
+  (add-hook 'prog-mode-hook
+            (lambda () (smartparens-mode +1))))
 
-(require 'yasnippet)
-(yas-reload-all)
-(add-hook 'prog-mode-hook #'yas-minor-mode)
-(add-to-list 'yas-snippet-dirs "~/.emacs.d/vendor/yasnippet-snippets")
+(req-package rainbow-delimiters
+  ;; color highlight parenthesis according to depth
+  :config
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-(setq which-key-popup-type 'side-window)
-(setq which-key-side-window-location 'bottom)
+(req-package uniquify
+  :config
+  (setq uniquify-buffer-name-style 'forward)
+  (setq uniquify-separator "/")
+  (setq uniquify-after-kill-buffer-p t)     ; rename after killing uniquified
+  (setq uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
 
-;; (add-to-list 'auto-mode-alist '("BUILD\\'" . python-mode))
+(req-package saveplace
+  :config
+  (setq save-place-file (expand-file-name "saveplace" savefile-dir))
+  (setq-default save-place t))
 
-(delete-selection-mode 0)
-(global-set-key (kbd "M-i") 'helm-semantic-or-imenu)
-(global-set-key (kbd "C--") 'negative-argument)
-(global-set-key (kbd "M-p") 'ace-window)
+(req-package savehist
+  :config
+  (setq savehist-additional-variables
+        ;; search entries
+        '(search-ring regexp-search-ring)
+        ;; save every minute
+        savehist-autosave-interval 60
+        ;; keep the home clean
+        savehist-file (expand-file-name "savehist" savefile-dir))
+  (savehist-mode +1))
 
-;; (global-set-key (kbd "C--") 'text-scale-decrease)
+(req-package recentf
+  :config
+  (setq recentf-save-file (expand-file-name "recentf" prelude-savefile-dir)
+        recentf-max-saved-items 500
+        recentf-max-menu-items 15
+        ;; disable recentf-cleanup on Emacs start, because it can cause
+        ;; problems with remote files
+        recentf-auto-cleanup 'never)
+  (recentf-mode +1))
 
-(put 'set-goal-column 'disabled nil)
+;; TODO: enable flyspell
+(req-package flyspell
+  :config
+  (setq ispell-program-name "aspell" ; use aspell instead of ispell
+        ispell-extra-args '("--sug-mode=ultra")))
 
-(require 'etags-select)
+(req-package bookmark
+  :config
+  (setq bookmark-default-file (expand-file-name "bookmarks" prelude-savefile-dir)
+        bookmark-save-flag 1))
 
-;; Load init.el after loading emacs
-(find-file "~/org/refile.org")
+(req-package undo-tree
+  :chords (("uu" . undo-tree-visualize))
+  :config
+  (global-undo-tree-mode))
+
+(req-package scala-mode
+  :config
+  (add-hook 'scala-mode-hook
+            (lambda ()
+              (subword-mode +1))))
+
+(req-package which-func
+  :config
+  (which-function-mode 1))
+
+(req-package flycheck
+  :config
+  (add-hook 'prog-mode-hook 'flycheck-mode))
+
+(req-package-finish)
 
 
+(find-file "~/.emacs.d/init.el")
 
-
-;;; init.el ends here
+;;; init-new.el ends here
