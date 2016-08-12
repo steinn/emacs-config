@@ -1,9 +1,5 @@
-*~
 *.elc
-auto-save-list
-ac-comphist.dat
-projectile-bookmarks.eld
-tramp
-session.*
-.python-environments
+auto-save-list/
+eshell/
 elpa/
+savefile/
