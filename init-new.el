@@ -141,9 +141,10 @@
 (req-package fill-column-indicator
   :config
   (setq fci-rule-column 80)
-  (define-globalized-minor-mode
-    global-fci-mode fci-mode (lambda () (fci-mode 1)))
-  (global-fci-mode 1))
+  (add-hook 'prog-mode-hook
+            (lambda () (fci-mode 1)))
+  (add-hook 'text-mode-hook
+            (lambda () (fci-mode 1))))
 
 (req-package ace-window
   :bind (("M-p" . ace-window)))
@@ -173,6 +174,11 @@
   (show-smartparens-global-mode +1)
   (add-hook 'prog-mode-hook
             (lambda () (smartparens-mode +1))))
+
+(req-package rainbow-delimiters
+  ;; color highlight parenthesis according to depth
+  :config
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
 (req-package uniquify
   :config
