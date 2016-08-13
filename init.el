@@ -84,8 +84,13 @@
 ;; .zsh file is shell script
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . shell-script-mode))
 
+;; disable vc
+(require 'vc)
+(setq vc-handled-backends ())
+
 (defvar init-dir (file-name-directory load-file-name))
 (defvar savefile-dir (expand-file-name "savefile" init-dir))
+(defvar vendor-dir (expand-file-name "vendor" init-dir))
 
 (setq custom-file (expand-file-name "custom.el" init-dir))
 
@@ -101,7 +106,16 @@
   :config
   (load-theme 'zenburn t))
 
+(req-package smart-mode-line
+  :require zenburn-theme
+  :config
+  (setq sml/no-confirm-load-theme t
+        sml/theme 'respectful
+        sml/col-number-format "%c")
+  (add-hook 'after-init-hook #'sml/setup))
+
 (req-package helm
+  :diminish helm-mode
   :chords (("xx"  . helm-M-x))
   :bind (("M-x" . helm-M-x)
          ("C-x b" . helm-mini)
@@ -117,29 +131,36 @@
         helm-ff-file-name-history-use-recentf t))
 
 (req-package helm-eshell
+  :require helm
   :config
   (add-hook 'eshell-mode-hook
             (lambda ()
               (eshell-cmpl-initialize)
               (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)
-              ))
+              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
   (setq eshell-directory-name (expand-file-name "eshell" savefile-dir)))
 
+(req-package helm-flycheck
+  :require helm
+  :config
+  (define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck))
+
 (req-package projectile
+  :diminish projectile-mode
   :config
   (projectile-global-mode)
   (setq projectile-completion-system 'helm
-        projectile-known-projects-file (expand-file-name "projectile-bookmarks.eld"
+        projectile-known-projects-file (expand-file-name "projectile-bookmarks.cache"
                                                          savefile-dir)))
 
 (req-package magit
   :bind (("C-x g" . magit-status)))
 
 (req-package whitespace
+  :diminish whitespace-mode
   :config
-  (setq whitespace-line-column 80)
-  (setq whitespace-style '(face tabs empty trailing)) ;; lines-tail
+  (setq whitespace-line-column 80
+        whitespace-style '(face tabs empty trailing)) ;; lines-tail
   (add-hook 'prog-mode-hook
             (lambda ()
               (add-hook 'before-save-hook #'whitespace-cleanup nil t)
@@ -175,14 +196,15 @@
   :config
   (global-auto-revert-mode t))
 
-
 (req-package smartparens
+  :diminish smartparens-mode
   :config
   (require 'smartparens-config)
-  (setq sp-base-key-bindings 'paredit)
-  (setq sp-autoskip-closing-pair 'always)
-  (setq sp-hybrid-kill-entire-symbol nil)
-  (sp-use-paredit-bindings)
+  (setq sp-base-key-bindings 'paredit
+        sp-autoskip-closing-pair 'always
+        sp-hybrid-kill-entire-symbol nil)
+  (sp-use-smartparens-bindings)
+  ;; (sp-use-paredit-bindings)
   (show-smartparens-global-mode +1)
   (add-hook 'prog-mode-hook
             (lambda () (smartparens-mode +1))))
@@ -194,10 +216,10 @@
 
 (req-package uniquify
   :config
-  (setq uniquify-buffer-name-style 'forward)
-  (setq uniquify-separator "/")
-  (setq uniquify-after-kill-buffer-p t)     ; rename after killing uniquified
-  (setq uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
+  (setq uniquify-buffer-name-style 'forward
+        uniquify-separator "/"
+        uniquify-after-kill-buffer-p t     ; rename after killing uniquified
+        uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
 
 (req-package saveplace
   :config
@@ -225,12 +247,6 @@
         recentf-auto-cleanup 'never)
   (recentf-mode +1))
 
-;; TODO: enable flyspell
-(req-package flyspell
-  :config
-  (setq ispell-program-name "aspell" ; use aspell instead of ispell
-        ispell-extra-args '("--sug-mode=ultra")))
-
 (req-package bookmark
   :config
   (setq bookmark-default-file (expand-file-name "bookmarks" savefile-dir)
@@ -256,7 +272,25 @@
   :config
   (which-function-mode 1))
 
+(req-package flyspell
+  :diminish flyspell-mode
+  :config
+  (setq ispell-program-name "aspell" ; use aspell instead of ispell
+        ispell-extra-args '("--sug-mode=ultra")
+        flyspell-issue-message-flag nil)
+  ;; enable flyspell-prog-mode
+  (dolist (hook '(prog-mode-hook))
+    (add-hook hook (lambda ()
+                     (when (executable-find ispell-program-name)
+                       (flyspell-prog-mode)))))
+  ;; enable flyspell-mode
+  (dolist (hook '(text-mode-hook))
+    (add-hook hook (lambda ()
+                     (when (executable-find ispell-program-name)
+                       (flyspell-mode +1))))))
+
 (req-package flycheck
+  :diminish flycheck-mode
   :config
   (add-hook 'prog-mode-hook 'flycheck-mode))
 
@@ -269,8 +303,25 @@
   :config
   (set-default 'imenu-auto-rescan t))
 
-(req-package-finish)
+(req-package yasnippet
+  :diminish yas-minor-mode
+  :config
+  (yas-reload-all)
+  (add-hook 'prog-mode-hook #'yas-minor-mode)
+  (add-to-list 'yas-snippet-dirs
+               (expand-file-name "yasnippet-snippets" vendor-dir)))
 
+(req-package which-key
+  :diminish which-key-mode
+  :config
+  (setq which-key-popup-type 'side-window
+        which-key-side-window-location 'bottom)
+  (which-key-mode +1))
+
+(req-package elisp-mode
+  :diminish (emacs-lisp-mode . "elisp"))
+
+(req-package-finish)
 
 (find-file "~/.emacs.d/init.el")
 
