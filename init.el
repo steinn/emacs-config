@@ -154,6 +154,7 @@
 
 (req-package projectile
   :diminish projectile-mode
+  :bind (("<f1>" . projectile-run-eshell))
   :config
   (projectile-global-mode)
   (setq projectile-completion-system 'helm
