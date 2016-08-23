@@ -145,6 +145,8 @@
               (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
   (setq eshell-directory-name (expand-file-name "eshell" savefile-dir)))
 
+(req-package eshell-z)
+
 (req-package helm-flycheck
   :require helm
   :config
