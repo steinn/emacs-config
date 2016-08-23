@@ -339,6 +339,20 @@
   (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
     (add-hook hook 'turn-on-elisp-slime-nav-mode)))
 
+(req-package autorevert
+  :diminish auto-revert-mode)
+
+(req-package smartscan
+  ;; M-n - smartscan-symbol-go-forward
+  ;; M-p - smartscan-symbol-go-backward
+  ;; M-' - smartscan-symbol-replace
+  :config
+  ;; (global-smartscan-mode)
+  (add-hook 'prog-mode-hook
+            (lambda () (smartscan-mode 1))))
+
+(req-package thrift)
+
 (req-package-finish)
 
 (find-file "~/.emacs.d/init.el")
