@@ -188,7 +188,7 @@
             (lambda () (fci-mode 1))))
 
 (req-package ace-window
-  :bind (("M-p" . ace-window)))
+  :bind (("M-o" . ace-window)))
 
 (req-package winner
   :config
