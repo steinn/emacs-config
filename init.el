@@ -99,7 +99,12 @@
 ;;
 (require-package 'req-package)
 
+(req-package key-chord
+  :config
+  (key-chord-define-global "gg" 'goto-line))
+
 (req-package use-package-chords
+  :require key-chord
   :config (key-chord-mode 1))
 
 (req-package zenburn-theme
