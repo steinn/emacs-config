@@ -5,7 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (volatile-highlights flycheck scala-mode undo-tree rainbow-delimiters smartparens ace-window fill-column-indicator magit projectile helm zenburn-theme use-package-chords req-package))))
+    (eshell-z thrift zenburn-theme yasnippet which-key volatile-highlights use-package-chords undo-tree smartscan smartparens smart-mode-line scala-mode req-package rainbow-delimiters projectile magit helm-flycheck helm fill-column-indicator elisp-slime-nav ace-window))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
