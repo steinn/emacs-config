@@ -327,7 +327,17 @@
   (which-key-mode +1))
 
 (req-package elisp-mode
-  :diminish (emacs-lisp-mode . "elisp"))
+  :config
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              (setq mode-name "elisp"))))
+
+(req-package elisp-slime-nav
+  :require ielm
+  :diminish elisp-slime-nav-mode
+  :config
+  (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
+    (add-hook hook 'turn-on-elisp-slime-nav-mode)))
 
 (req-package-finish)
 
