@@ -94,6 +94,9 @@
 
 (setq custom-file (expand-file-name "custom.el" init-dir))
 
+(setq exec-path (append exec-path '(expand-file-name "~/.local/bin")))
+
+
 ;;
 ;; Setup packages
 ;;
@@ -161,6 +164,11 @@
   (setq projectile-completion-system 'helm
         projectile-known-projects-file (expand-file-name "projectile-bookmarks.cache"
                                                          savefile-dir)))
+
+;; (req-package helm-projectile
+;;   :require projectile
+;;   :config
+;;   )
 
 (req-package magit
   :bind (("C-x g" . magit-status)))
@@ -354,7 +362,7 @@
 
 (req-package thrift)
 
-(req-package 'gdb-mi
+(req-package gdb-mi
   :config
   ;; Force gdb-mi to not dedicate any windows
   (defadvice gdb-display-buffer (after undedicate-gdb-display-buffer)
@@ -365,8 +373,19 @@
     (set-window-dedicated-p window nil))
   (ad-activate 'gdb-set-window-buffer))
 
+(req-package org
+  :demand
+  :bind (("C-c a" . org-agenda)
+         ("C-c l" . org-store-link)))
+
+(req-package jedi
+  :config
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (setq jedi:setup-keys t)
+  (setq jedi:complete-on-dot t))
 
 (req-package-finish)
+
 
 (find-file "~/.emacs.d/init.el")
 
