@@ -381,8 +381,38 @@
 (req-package jedi
   :config
   (add-hook 'python-mode-hook 'jedi:setup)
-  (setq jedi:setup-keys t)
   (setq jedi:complete-on-dot t))
+
+(req-package pyvenv)
+
+;; (req-package js
+;;   :config
+;;   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-jsx-mode))
+;;   (setq js-indent-level 2))
+
+(req-package flycheck-flow
+  :config
+  (flycheck-add-mode 'javascript-flow 'js2-jsx-mode))
+
+
+(req-package js2-mode
+  :require flycheck
+  :config
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-jsx-mode))
+  (setq js-indent-level 2))
+
+(req-package multiple-cursors
+  :config
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+
+(req-package omnisharp
+  :config
+  (add-hook 'csharp-mode-hook 'omnisharp-mode)
+  (setq omnisharp-server-executable-path
+        (expand-file-name "~/src/omnisharp-server/OmniSharp/bin/Debug/OmniSharp.exe")))
 
 (req-package-finish)
 
