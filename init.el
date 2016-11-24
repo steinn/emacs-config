@@ -96,7 +96,6 @@
 
 (setq exec-path (append exec-path '(expand-file-name "~/.local/bin")))
 
-
 ;;
 ;; Setup packages
 ;;
@@ -413,6 +412,14 @@
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
   (setq omnisharp-server-executable-path
         (expand-file-name "~/src/omnisharp-server/OmniSharp/bin/Debug/OmniSharp.exe")))
+
+(req-package terraform-mode)
+
+(req-package yaml-mode)
+
+(req-package go-mode
+  :config
+  (add-hook 'go-mode-hook (lambda () (whitespace-mode -1))))
 
 (req-package-finish)
 
