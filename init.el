@@ -88,6 +88,12 @@
 (require 'vc)
 (setq vc-handled-backends ())
 
+(setq confirm-kill-emacs 'y-or-n-p)
+
+(global-set-key (kbd "C-+") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+
+
 (defvar init-dir (file-name-directory load-file-name))
 (defvar savefile-dir (expand-file-name "savefile" init-dir))
 (defvar vendor-dir (expand-file-name "vendor" init-dir))
@@ -95,15 +101,23 @@
 (setq custom-file (expand-file-name "custom.el" init-dir))
 
 (setq exec-path (append exec-path '(expand-file-name "~/.local/bin")))
+(setq exec-path (append exec-path '(expand-file-name "~/.opam/4.02.3/bin/")))
+(setq exec-path (append exec-path '(expand-file-name "~/.dotfiles/bin/")))
+
+
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region compilation-filter-start (point))
+  (toggle-read-only))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
 ;;
 ;; Setup packages
 ;;
 (require-package 'req-package)
 
-(req-package key-chord
-  :config
-  (key-chord-define-global "gg" 'goto-line))
+(req-package key-chord)
 
 (req-package use-package-chords
   :require key-chord
@@ -158,16 +172,18 @@
   :diminish projectile-mode
   :bind (("<f1>" . projectile-run-eshell))
   :demand
+  :init
+  (setq projectile-known-projects-file (expand-file-name "projectile-bookmarks.cache" savefile-dir))
   :config
-  (projectile-global-mode)
-  (setq projectile-completion-system 'helm
-        projectile-known-projects-file (expand-file-name "projectile-bookmarks.cache"
-                                                         savefile-dir)))
+  (projectile-mode))
 
-;; (req-package helm-projectile
-;;   :require projectile
-;;   :config
-;;   )
+(req-package helm-projectile
+  :require projectile
+  :config
+  (message "HELM-PROJECTILE")
+  (helm-projectile-on))
+
+(req-package helm-ag)
 
 (req-package magit
   :bind (("C-x g" . magit-status)))
@@ -189,7 +205,7 @@
 
 (req-package fill-column-indicator
   :config
-  (setq fci-rule-column 80)
+  (setq fci-rule-column 90)
   (add-hook 'prog-mode-hook
             (lambda () (fci-mode 1)))
   (add-hook 'text-mode-hook
@@ -375,14 +391,25 @@
 (req-package org
   :demand
   :bind (("C-c a" . org-agenda)
-         ("C-c l" . org-store-link)))
+         ("C-c l" . org-store-link))
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t)
+     (emacs-lisp . t)
+     ))
+  )
 
 (req-package jedi
   :config
   (add-hook 'python-mode-hook 'jedi:setup)
   (setq jedi:complete-on-dot t))
 
-(req-package pyvenv)
+;; (req-package pyvenv)
+(req-package virtualenvwrapper
+  :config
+  (venv-initialize-interactive-shells)
+  (venv-initialize-eshell))
 
 ;; (req-package js
 ;;   :config
@@ -410,8 +437,13 @@
 (req-package omnisharp
   :config
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
+  (add-hook 'csharp-mode-hook (lambda () (whitespace-mode -1)))
   (setq omnisharp-server-executable-path
-        (expand-file-name "~/src/omnisharp-server/OmniSharp/bin/Debug/OmniSharp.exe")))
+        (expand-file-name "/home/steinn/.local/omnisharp-mono/OmniSharp.exe")))
+
+(req-package csharp-mode
+  :config
+  (add-hook 'csharp-mode-hook (lambda () (whitespace-mode -1))))
 
 (req-package terraform-mode)
 
@@ -421,9 +453,59 @@
   :config
   (add-hook 'go-mode-hook (lambda () (whitespace-mode -1))))
 
+(req-package make-mode
+  :config
+  (add-hook 'makefile-mode-hook (lambda () (whitespace-mode -1))))
+
+(req-package rust-mode)
+
+(req-package markdown-mode)
+
+(req-package python-mode
+  :config
+  (add-to-list 'auto-mode-alist '("BUILD" . python-mode)))
+
+;; ocaml packages
+(req-package tuareg)
+(req-package utop)
+
+
+;; javascript
+;; (req-package tern
+;;   :config
+;;   (add-hook 'js-mode-hook (lambda () (tern-mode t))))
+;; (req-package tern-auto-complete
+;;   :config
+;;   (add-hook 'js-mode-hook (lambda() (auto-complete-mode))))
+
+;; lua
+(req-package lua-mode)
+
+;; org-mode presentation stuff
+(req-package epresent
+  :config
+  ;; (setq epresent-mode-line nil)
+  (add-hook 'epresent-start-presentation-hook (lambda ()
+                                                (whitespace-mode -1)
+                                                (fci-mode -1))))
+
+(req-package ensime
+  :config
+  (setq sbt:program-name "/usr/share/sbt/bin/sbt"))
+
+(req-package exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize))
+
+(req-package protobuf-mode)
+
 (req-package-finish)
 
 
 (find-file "~/.emacs.d/init.el")
 
+
+;; (setq ring-bell-function #'ignore)
+
 ;;; init-new.el ends here
+(put 'downcase-region 'disabled nil)
