@@ -3,3 +3,5 @@ auto-save-list/
 eshell/
 elpa/
 savefile/
+abbrev_defs
+ac-comphist.dat
