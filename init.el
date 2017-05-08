@@ -90,8 +90,8 @@
 
 (setq confirm-kill-emacs 'y-or-n-p)
 
-(global-set-key (kbd "C-+") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
+;; (global-set-key (kbd "C-+") 'text-scale-increase)
+;; (global-set-key (kbd "C--") 'text-scale-decrease)
 
 
 (defvar init-dir (file-name-directory load-file-name))
@@ -205,7 +205,7 @@
 
 (req-package fill-column-indicator
   :config
-  (setq fci-rule-column 90)
+  (setq fci-rule-column 80)
   (add-hook 'prog-mode-hook
             (lambda () (fci-mode 1)))
   (add-hook 'text-mode-hook
@@ -498,6 +498,12 @@
   (exec-path-from-shell-initialize))
 
 (req-package protobuf-mode)
+
+(req-package zoom-frm
+  :config
+  (global-set-key (kbd "C-+") 'zoom-frm-in)
+  (global-set-key (kbd "C--") 'zoom-frm-out))
+
 
 (req-package-finish)
 
