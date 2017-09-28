@@ -416,16 +416,26 @@
 ;;   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-jsx-mode))
 ;;   (setq js-indent-level 2))
 
-(req-package flycheck-flow
-  :config
-  (flycheck-add-mode 'javascript-flow 'js2-jsx-mode))
+;; (req-package flycheck-flow
+;;   :config
+;;   (flycheck-add-mode 'javascript-flow 'js2-jsx-mode))
 
 
 (req-package js2-mode
   :require flycheck
   :config
   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-jsx-mode))
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-jsx-mode))
   (setq js-indent-level 2))
+
+(req-package prettier-js
+  :require js2-mode
+  :config
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  (setq prettier-js-args '("--single-quote"
+                           "--trailing-comma" "es5"
+                           "--bracket-spacing" "false"
+                           "--parser" "flow")))
 
 (req-package multiple-cursors
   :config
@@ -489,9 +499,9 @@
                                                 (whitespace-mode -1)
                                                 (fci-mode -1))))
 
-(req-package ensime
-  :config
-  (setq sbt:program-name "/usr/share/sbt/bin/sbt"))
+;; (req-package ensime
+;;   :config
+;;   (setq sbt:program-name "/usr/share/sbt/bin/sbt"))
 
 (req-package exec-path-from-shell
   :config

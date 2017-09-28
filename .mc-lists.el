@@ -7,6 +7,7 @@
         electric-newline-and-maybe-indent
         org-delete-char
         org-end-of-line
+        org-force-self-insert
         org-self-insert-command
         ))
 
