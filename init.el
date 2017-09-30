@@ -42,6 +42,9 @@
 ;; disable startup screen
 (setq inhibit-startup-screen t)
 
+;; don't create lock files (.#<filename>)
+(setq create-lockfiles nil)
+
 ;; disable scroll bar
 (scroll-bar-mode -1)
 
