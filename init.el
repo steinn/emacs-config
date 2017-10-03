@@ -8,6 +8,14 @@
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 (package-initialize)
 
+
+;; setup quelpa
+(if (require 'quelpa nil t)
+    (quelpa-self-upgrade)
+  (with-temp-buffer
+    (url-insert-file-contents "https://raw.github.com/quelpa/quelpa/master/bootstrap.el")
+    (eval-buffer)))
+
 ;; emacs server
 (require 'server)
 (unless (server-running-p)
@@ -103,9 +111,10 @@
 
 (setq custom-file (expand-file-name "custom.el" init-dir))
 
-(setq exec-path (append exec-path '(expand-file-name "~/.local/bin")))
-(setq exec-path (append exec-path '(expand-file-name "~/.opam/4.02.3/bin/")))
-(setq exec-path (append exec-path '(expand-file-name "~/.dotfiles/bin/")))
+;; (setq exec-path (append exec-path '(expand-file-name "~/.local/bin")))
+;; (setq exec-path (append exec-path '(expand-file-name "~/.opam/4.02.3/bin/")))
+;; (setq exec-path (append exec-path '(expand-file-name "~/.dotfiles/bin/")))
+;; (setq exec-path (append exec-path '(expand-file-name "/usr/local/bin/")))
 
 
 (require 'ansi-color)
@@ -153,6 +162,12 @@
         helm-move-to-line-cycle-in-source     t
         helm-ff-search-library-in-sexp        t
         helm-ff-file-name-history-use-recentf t))
+
+(req-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (add-to-list 'exec-path-from-shell-variables "ANDROID_HOME")
+    (exec-path-from-shell-initialize)))
 
 (req-package helm-eshell
   :require helm
@@ -297,6 +312,7 @@
   (setq undo-tree-auto-save-history t)
   (global-undo-tree-mode))
 
+(req-package thrift)
 (req-package scala-mode
   :config
   (add-hook 'scala-mode-hook
@@ -378,19 +394,6 @@
   (add-hook 'prog-mode-hook
             (lambda () (smartscan-mode 1))))
 
-(req-package thrift)
-
-(req-package gdb-mi
-  :config
-  ;; Force gdb-mi to not dedicate any windows
-  (defadvice gdb-display-buffer (after undedicate-gdb-display-buffer)
-    (set-window-dedicated-p ad-return-value nil))
-  (ad-activate 'gdb-display-buffer)
-
-  (defadvice gdb-set-window-buffer (after undedicate-gdb-set-window-buffer (name &optional ignore-dedi window))
-    (set-window-dedicated-p window nil))
-  (ad-activate 'gdb-set-window-buffer))
-
 (req-package org
   :demand
   :bind (("C-c a" . org-agenda)
@@ -403,27 +406,23 @@
      ))
   )
 
-(req-package jedi
+;; python
+(req-package python-mode
   :config
-  (add-hook 'python-mode-hook 'jedi:setup)
-  (setq jedi:complete-on-dot t))
-
-;; (req-package pyvenv)
-(req-package virtualenvwrapper
-  :config
-  (venv-initialize-interactive-shells)
-  (venv-initialize-eshell))
-
-;; (req-package js
+  (addv-to-list 'auto-mode-alist '("BUILD" . python-mode)))
+;; (req-package jedi
 ;;   :config
-;;   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-jsx-mode))
-;;   (setq js-indent-level 2))
+;;   (add-hook 'python-mode-hook 'jedi:setup)
+;;   (setq jedi:complete-on-dot t))
+;; (req-package virtualenvwrapper
+;;   :config
+;;   (venv-initialize-interactive-shells)
+;;   (venv-initialize-eshell))
 
+;; javascript
 ;; (req-package flycheck-flow
 ;;   :config
 ;;   (flycheck-add-mode 'javascript-flow 'js2-jsx-mode))
-
-
 (req-package js2-mode
   :require flycheck
   :config
@@ -447,17 +446,6 @@
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
 
-(req-package omnisharp
-  :config
-  (add-hook 'csharp-mode-hook 'omnisharp-mode)
-  (add-hook 'csharp-mode-hook (lambda () (whitespace-mode -1)))
-  (setq omnisharp-server-executable-path
-        (expand-file-name "/home/steinn/.local/omnisharp-mono/OmniSharp.exe")))
-
-(req-package csharp-mode
-  :config
-  (add-hook 'csharp-mode-hook (lambda () (whitespace-mode -1))))
-
 (req-package terraform-mode)
 
 (req-package yaml-mode)
@@ -471,28 +459,15 @@
   (add-hook 'makefile-mode-hook (lambda () (whitespace-mode -1))))
 
 (req-package rust-mode)
+(req-package lua-mode)
+(req-package protobuf-mode)
 
 (req-package markdown-mode)
-
-(req-package python-mode
-  :config
-  (add-to-list 'auto-mode-alist '("BUILD" . python-mode)))
 
 ;; ocaml packages
 (req-package tuareg)
 (req-package utop)
-
-
-;; javascript
-;; (req-package tern
-;;   :config
-;;   (add-hook 'js-mode-hook (lambda () (tern-mode t))))
-;; (req-package tern-auto-complete
-;;   :config
-;;   (add-hook 'js-mode-hook (lambda() (auto-complete-mode))))
-
-;; lua
-(req-package lua-mode)
+(req-package merlin)
 
 ;; org-mode presentation stuff
 (req-package epresent
@@ -502,29 +477,18 @@
                                                 (whitespace-mode -1)
                                                 (fci-mode -1))))
 
-;; (req-package ensime
-;;   :config
-;;   (setq sbt:program-name "/usr/share/sbt/bin/sbt"))
-
-(req-package exec-path-from-shell
-  :config
-  (exec-path-from-shell-initialize))
-
-(req-package protobuf-mode)
-
 (req-package zoom-frm
   :config
   (global-set-key (kbd "C-+") 'zoom-frm-in)
   (global-set-key (kbd "C--") 'zoom-frm-out))
 
-
 (req-package-finish)
 
+(quelpa '(reason-mode :repo "reasonml-editor/reason-mode" :fetcher github :stable t))
+(add-hook 'reason-mode-hook (lambda ()
+                              (add-hook 'before-save-hook 'refmt-before-save)
+                              (merlin-mode)))
+
+(setq merlin-ac-setup t)
 
 (find-file "~/.emacs.d/init.el")
-
-
-;; (setq ring-bell-function #'ignore)
-
-;;; init-new.el ends here
-(put 'downcase-region 'disabled nil)
