@@ -186,8 +186,12 @@
   :config
   (define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck))
 
+(req-package flx-ido)
+(req-package ag)
+
 (req-package projectile
   :diminish projectile-mode
+  :require flx-ido
   :bind (("<f1>" . projectile-run-eshell))
   :demand
   :init
@@ -195,13 +199,13 @@
   :config
   (projectile-mode))
 
-(req-package helm-projectile
-  :require projectile
-  :config
-  (message "HELM-PROJECTILE")
-  (helm-projectile-on))
+;; (req-package helm-projectile
+;;   :require projectile
+;;   :config
+;;   (message "HELM-PROJECTILE")
+;;   (helm-projectile-on))
 
-(req-package helm-ag)
+;; (req-package helm-ag)
 
 (req-package magit
   :bind (("C-x g" . magit-status)))
@@ -236,11 +240,12 @@
   :config
   (winner-mode +1))
 
-(req-package windmove
-  :bind (("<S-left>"  . windmove-left)
-         ("<S-right>" . windmove-right)
-         ("<S-up>"    . windmove-up)
-         ("<S-down>"  . windmove-down)))
+;; (req-package windmove
+;;   :bind (("<S-left>"  . windmove-left)
+;;          ("<S-right>" . windmove-right)
+;;          ("<S-up>"    . windmove-up)
+;;          ("<S-down>"  . windmove-down)))
+
 
 (req-package autorevert
   :config
@@ -465,9 +470,9 @@
 (req-package markdown-mode)
 
 ;; ocaml packages
-(req-package tuareg)
-(req-package utop)
-(req-package merlin)
+;; (req-package tuareg)
+;; (req-package utop)
+;; (req-package merlin)
 
 ;; org-mode presentation stuff
 (req-package epresent
@@ -482,13 +487,62 @@
   (global-set-key (kbd "C-+") 'zoom-frm-in)
   (global-set-key (kbd "C--") 'zoom-frm-out))
 
+(req-package graphviz-dot-mode)
+
+(req-package omnisharp
+  :require company
+  :config
+  (add-hook 'csharp-mode-hook 'omnisharp-mode)
+  (add-to-list 'company-backends 'company-omnisharp)
+  (define-key omnisharp-mode-map (kbd ".") 'omnisharp-add-dot-and-auto-complete)
+  (define-key omnisharp-mode-map (kbd "<C-SPC>") 'omnisharp-auto-complete))
+
+
+
 (req-package-finish)
 
 (quelpa '(reason-mode :repo "reasonml-editor/reason-mode" :fetcher github :stable t))
+
+
+(defun shell-cmd (cmd)
+  "Returns the stdout output of a shell command or nil if the command returned
+   an error"
+  (car (ignore-errors (apply 'process-lines (split-string cmd)))))
+
+;; (let* ((refmt-bin (or (shell-cmd "refmt ----where")
+;;                       (shell-cmd "which refmt")))
+;;        (merlin-bin (or (shell-cmd "ocamlmerlin ----where")
+;;                        (shell-cmd "which ocamlmerlin")))
+;;        (merlin-base-dir (when merlin-bin
+;;                           (replace-regexp-in-string "bin/ocamlmerlin$" "" merlin-bin))))
+;;   ;; Add npm merlin.el to the emacs load path and tell emacs where to find ocamlmerlin
+;;   (when merlin-bin
+;;     (add-to-list 'load-path (concat merlin-base-dir "share/emacs/site-lisp/"))
+;;     (setq merlin-command merlin-bin))
+
+;;   (when refmt-bin
+;;     (setq refmt-command refmt-bin)))
+
+
+(let* ((refmt-bin (shell-cmd "refmt ----where"))
+https://github.com/OmniSharp/omnisharp-emacs/search?utf8=%E2%9C%93&q=helm&type=       (merlin-bin (shell-cmd "ocamlmerlin ----where"))
+       (merlin-base-dir (when merlin-bin
+                          (replace-regexp-in-string "bin/ocamlmerlin$" "" merlin-bin))))
+  ;; Add npm merlin.el to the emacs load path and tell emacs where to find ocamlmerlin
+  (when merlin-bin
+    (add-to-list 'load-path (concat merlin-base-dir "share/emacs/site-lisp/"))
+    (setq merlin-command merlin-bin))
+
+  (when refmt-bin
+    (setq refmt-command refmt-bin)))
+
+(require 'reason-mode)
+(require 'merlin)
 (add-hook 'reason-mode-hook (lambda ()
                               (add-hook 'before-save-hook 'refmt-before-save)
                               (merlin-mode)))
-
 (setq merlin-ac-setup t)
+
+
 
 (find-file "~/.emacs.d/init.el")

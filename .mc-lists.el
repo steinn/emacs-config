@@ -5,6 +5,7 @@
       '(
         delete-window
         electric-newline-and-maybe-indent
+        helm-M-x
         org-delete-char
         org-end-of-line
         org-force-self-insert
@@ -13,6 +14,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        end-of-buffer
         kill-region
         yaml-electric-backspace
         ))
