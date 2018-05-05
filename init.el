@@ -101,21 +101,11 @@
 
 (setq confirm-kill-emacs 'y-or-n-p)
 
-;; (global-set-key (kbd "C-+") 'text-scale-increase)
-;; (global-set-key (kbd "C--") 'text-scale-decrease)
-
-
 (defvar init-dir (file-name-directory load-file-name))
 (defvar savefile-dir (expand-file-name "savefile" init-dir))
 (defvar vendor-dir (expand-file-name "vendor" init-dir))
 
 (setq custom-file (expand-file-name "custom.el" init-dir))
-
-;; (setq exec-path (append exec-path '(expand-file-name "~/.local/bin")))
-;; (setq exec-path (append exec-path '(expand-file-name "~/.opam/4.02.3/bin/")))
-;; (setq exec-path (append exec-path '(expand-file-name "~/.dotfiles/bin/")))
-;; (setq exec-path (append exec-path '(expand-file-name "/usr/local/bin/")))
-
 
 (require 'ansi-color)
 (defun colorize-compilation-buffer ()
@@ -205,7 +195,7 @@
 ;;   (message "HELM-PROJECTILE")
 ;;   (helm-projectile-on))
 
-;; (req-package helm-ag)
+(req-package helm-ag)
 
 (req-package magit
   :bind (("C-x g" . magit-status)))
@@ -225,31 +215,19 @@
               (add-hook 'before-save-hook #'whitespace-cleanup nil t)
               )))
 
-(req-package fill-column-indicator
-  :config
-  (setq fci-rule-column 80)
-  (add-hook 'prog-mode-hook
-            (lambda () (fci-mode 1)))
-  (add-hook 'text-mode-hook
-            (lambda () (fci-mode 1))))
+
+;; Can't use this with company mode because the pop-up is rendered
+;; incorrectly because of this mode.
+;; (req-package fill-column-indicator
+;;   :config
+;;   (setq fci-rule-column 80)
+;;   (add-hook 'prog-mode-hook
+;;             (lambda () (fci-mode 1)))
+;;   (add-hook 'text-mode-hook
+;;             (lambda () (fci-mode 1))))
 
 (req-package ace-window
   :bind (("M-o" . ace-window)))
-
-(req-package winner
-  :config
-  (winner-mode +1))
-
-;; (req-package windmove
-;;   :bind (("<S-left>"  . windmove-left)
-;;          ("<S-right>" . windmove-right)
-;;          ("<S-up>"    . windmove-up)
-;;          ("<S-down>"  . windmove-down)))
-
-
-(req-package autorevert
-  :config
-  (global-auto-revert-mode t))
 
 (req-package smartparens
   :diminish smartparens-mode
@@ -317,17 +295,6 @@
   (setq undo-tree-auto-save-history t)
   (global-undo-tree-mode))
 
-(req-package thrift)
-(req-package scala-mode
-  :config
-  (add-hook 'scala-mode-hook
-            (lambda ()
-              (subword-mode +1))))
-
-(req-package which-func
-  :config
-  (which-function-mode 1))
-
 (req-package flyspell
   :diminish flyspell-mode
   :config
@@ -388,7 +355,10 @@
     (add-hook hook 'turn-on-elisp-slime-nav-mode)))
 
 (req-package autorevert
-  :diminish auto-revert-mode)
+  :diminish auto-revert-mode
+  :config
+  (global-auto-revert-mode t))
+
 
 (req-package smartscan
   ;; M-n - smartscan-symbol-go-forward
@@ -415,19 +385,7 @@
 (req-package python-mode
   :config
   (addv-to-list 'auto-mode-alist '("BUILD" . python-mode)))
-;; (req-package jedi
-;;   :config
-;;   (add-hook 'python-mode-hook 'jedi:setup)
-;;   (setq jedi:complete-on-dot t))
-;; (req-package virtualenvwrapper
-;;   :config
-;;   (venv-initialize-interactive-shells)
-;;   (venv-initialize-eshell))
 
-;; javascript
-;; (req-package flycheck-flow
-;;   :config
-;;   (flycheck-add-mode 'javascript-flow 'js2-jsx-mode))
 (req-package js2-mode
   :require flycheck
   :config
@@ -451,36 +409,8 @@
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
 
-(req-package terraform-mode)
-
 (req-package yaml-mode)
-
-(req-package go-mode
-  :config
-  (add-hook 'go-mode-hook (lambda () (whitespace-mode -1))))
-
-(req-package make-mode
-  :config
-  (add-hook 'makefile-mode-hook (lambda () (whitespace-mode -1))))
-
-(req-package rust-mode)
-(req-package lua-mode)
-(req-package protobuf-mode)
-
 (req-package markdown-mode)
-
-;; ocaml packages
-;; (req-package tuareg)
-;; (req-package utop)
-;; (req-package merlin)
-
-;; org-mode presentation stuff
-(req-package epresent
-  :config
-  ;; (setq epresent-mode-line nil)
-  (add-hook 'epresent-start-presentation-hook (lambda ()
-                                                (whitespace-mode -1)
-                                                (fci-mode -1))))
 
 (req-package zoom-frm
   :config
@@ -490,12 +420,13 @@
 (req-package graphviz-dot-mode)
 
 (req-package omnisharp
-  :require company
+  :require company flycheck
   :config
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
   (add-to-list 'company-backends 'company-omnisharp)
   (define-key omnisharp-mode-map (kbd ".") 'omnisharp-add-dot-and-auto-complete)
-  (define-key omnisharp-mode-map (kbd "<C-SPC>") 'omnisharp-auto-complete))
+  (define-key omnisharp-mode-map (kbd "<C-SPC>") 'omnisharp-auto-complete)
+  (define-key omnisharp-mode-map (kbd "<M-.>") 'omnisharp-go-to-definition))
 
 
 
@@ -503,29 +434,13 @@
 
 (quelpa '(reason-mode :repo "reasonml-editor/reason-mode" :fetcher github :stable t))
 
-
 (defun shell-cmd (cmd)
   "Returns the stdout output of a shell command or nil if the command returned
    an error"
   (car (ignore-errors (apply 'process-lines (split-string cmd)))))
 
-;; (let* ((refmt-bin (or (shell-cmd "refmt ----where")
-;;                       (shell-cmd "which refmt")))
-;;        (merlin-bin (or (shell-cmd "ocamlmerlin ----where")
-;;                        (shell-cmd "which ocamlmerlin")))
-;;        (merlin-base-dir (when merlin-bin
-;;                           (replace-regexp-in-string "bin/ocamlmerlin$" "" merlin-bin))))
-;;   ;; Add npm merlin.el to the emacs load path and tell emacs where to find ocamlmerlin
-;;   (when merlin-bin
-;;     (add-to-list 'load-path (concat merlin-base-dir "share/emacs/site-lisp/"))
-;;     (setq merlin-command merlin-bin))
-
-;;   (when refmt-bin
-;;     (setq refmt-command refmt-bin)))
-
-
 (let* ((refmt-bin (shell-cmd "refmt ----where"))
-https://github.com/OmniSharp/omnisharp-emacs/search?utf8=%E2%9C%93&q=helm&type=       (merlin-bin (shell-cmd "ocamlmerlin ----where"))
+       (merlin-bin (shell-cmd "ocamlmerlin ----where"))
        (merlin-base-dir (when merlin-bin
                           (replace-regexp-in-string "bin/ocamlmerlin$" "" merlin-bin))))
   ;; Add npm merlin.el to the emacs load path and tell emacs where to find ocamlmerlin
@@ -542,7 +457,5 @@ https://github.com/OmniSharp/omnisharp-emacs/search?utf8=%E2%9C%93&q=helm&type= 
                               (add-hook 'before-save-hook 'refmt-before-save)
                               (merlin-mode)))
 (setq merlin-ac-setup t)
-
-
 
 (find-file "~/.emacs.d/init.el")
