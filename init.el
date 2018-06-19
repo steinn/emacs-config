@@ -425,8 +425,10 @@
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
   (add-to-list 'company-backends 'company-omnisharp)
   (define-key omnisharp-mode-map (kbd ".") 'omnisharp-add-dot-and-auto-complete)
-  (define-key omnisharp-mode-map (kbd "<C-SPC>") 'omnisharp-auto-complete)
-  (define-key omnisharp-mode-map (kbd "<M-.>") 'omnisharp-go-to-definition))
+  (define-key omnisharp-mode-map (kbd "<M-SPC>") 'omnisharp-auto-complete)
+  (define-key omnisharp-mode-map (kbd "M-.") 'omnisharp-go-to-definition)
+  (setq c-basic-offset 2))
+
 
 
 
