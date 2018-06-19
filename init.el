@@ -4,8 +4,11 @@
 
 ;; elpa
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("melpa-stable" . "https://stable.melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("marmalade" . "https://marmalade-repo.org/packages/")))
 (package-initialize)
 
 
@@ -33,6 +36,20 @@
                   (if AVAIL
                       (package-install package)))
                 (require package))))
+
+
+;; setup req-package
+(require-package 'use-package)
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+(require-package 'req-package)
+(use-package use-package-chords
+  :ensure t)
+(use-package req-package
+  :ensure t
+  :config (req-package--log-set-level 'debug))
+
 
 ;; disable tool-bar
 (when (fboundp 'tool-bar-mode)
@@ -117,13 +134,10 @@
 ;;
 ;; Setup packages
 ;;
-(require-package 'req-package)
 
-(req-package key-chord)
-
-(req-package use-package-chords
-  :require key-chord
-  :config (key-chord-mode 1))
+(req-package key-chord
+  :config
+  (key-chord-mode 1))
 
 (req-package zenburn-theme
   :config
@@ -158,16 +172,6 @@
   (when (memq window-system '(mac ns x))
     (add-to-list 'exec-path-from-shell-variables "ANDROID_HOME")
     (exec-path-from-shell-initialize)))
-
-(req-package helm-eshell
-  :require helm
-  :config
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (eshell-cmpl-initialize)
-              (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
-  (setq eshell-directory-name (expand-file-name "eshell" savefile-dir)))
 
 (req-package eshell-z)
 
@@ -247,12 +251,12 @@
   :config
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-(req-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'forward
-        uniquify-separator "/"
-        uniquify-after-kill-buffer-p t     ; rename after killing uniquified
-        uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
+;; (req-package uniquify
+;;   :config
+;;   (setq uniquify-buffer-name-style 'forward
+;;         uniquify-separator "/"
+;;         uniquify-after-kill-buffer-p t     ; rename after killing uniquified
+;;         uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
 
 (req-package saveplace
   :config
@@ -341,19 +345,6 @@
         which-key-side-window-location 'bottom)
   (which-key-mode +1))
 
-(req-package elisp-mode
-  :config
-  (add-hook 'emacs-lisp-mode-hook
-            (lambda ()
-              (setq mode-name "elisp"))))
-
-(req-package elisp-slime-nav
-  :require ielm
-  :diminish elisp-slime-nav-mode
-  :config
-  (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
-    (add-hook hook 'turn-on-elisp-slime-nav-mode)))
-
 (req-package autorevert
   :diminish auto-revert-mode
   :config
@@ -412,10 +403,10 @@
 (req-package yaml-mode)
 (req-package markdown-mode)
 
-(req-package zoom-frm
-  :config
-  (global-set-key (kbd "C-+") 'zoom-frm-in)
-  (global-set-key (kbd "C--") 'zoom-frm-out))
+;; (req-package zoom-frm
+;;   :config
+;;   (global-set-key (kbd "C-+") 'zoom-frm-in)
+;;   (global-set-key (kbd "C--") 'zoom-frm-out))
 
 (req-package graphviz-dot-mode)
 
