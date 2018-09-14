@@ -7,3 +7,6 @@ abbrev_defs
 ac-comphist.dat
 quelpa/
 network-security.data
+.cache/
+url/
+projectile.cache
