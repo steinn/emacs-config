@@ -421,6 +421,13 @@
   (setq c-basic-offset 2))
 
 
+(req-package modern-cpp-font-lock
+  :config
+  (add-hook 'c++-mode-hook #'modern-c++-font-lock-mode))
+
+(req-package clang-format
+  :config
+  (fset 'c-indent-region 'clang-format-region))
 
 
 (req-package-finish)

@@ -3,6 +3,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        c-electric-delete-forward
         delete-window
         electric-newline-and-maybe-indent
         helm-M-x
