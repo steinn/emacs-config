@@ -5,16 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (zenburn-theme yasnippet yaml-mode which-key volatile-highlights use-package-chords undo-tree smartscan smartparens smart-mode-line req-package reason-mode rainbow-delimiters quelpa python-mode projectile prettier-js omnisharp multiple-cursors modern-cpp-font-lock markdown-mode magit js2-mode helm-flycheck helm-ag graphviz-dot-mode flx-ido exec-path-from-shell eshell-z elisp-slime-nav company clang-format ag ace-window)))
- '(safe-local-variable-values
-   (quote
-    ((eval setq-local flycheck-clang-include-path
-           (list
-            (expand-file-name
-             (concat
-              (locate-dominating-file default-directory ".dir-locals.el")
-              "protobuf-2.5.0/src"))))
-     (flycheck-clang-language-standard . c++11)))))
+    (json-mode zenburn-theme yasnippet yaml-mode which-key volatile-highlights use-package-chords undo-tree typescript tide smartscan smartparens smart-mode-line shut-up req-package reason-mode rainbow-delimiters quelpa python-mode prettier-js omnisharp multiple-cursors modern-cpp-font-lock magit-popup magit-circleci lsp-mode helm-flycheck helm-ag graphviz-dot-mode graphql gradle-mode ghub flx-ido exec-path-from-shell eshell-z el-get ein editorconfig counsel-projectile company clang-format ag ace-window 0blayout))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

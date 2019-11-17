@@ -14,10 +14,10 @@
 
 ;; setup quelpa
 (if (require 'quelpa nil t)
-    (quelpa-self-upgrade)
-  (with-temp-buffer
-    (url-insert-file-contents "https://raw.github.com/quelpa/quelpa/master/bootstrap.el")
-    (eval-buffer)))
+   (quelpa-self-upgrade)
+ (with-temp-buffer
+   (url-insert-file-contents "https://raw.github.com/quelpa/quelpa/master/bootstrap.el")
+   (eval-buffer)))
 
 ;; emacs server
 (require 'server)
@@ -25,8 +25,7 @@
   (server-start))
 
 (defun require-package (package)
-  """Refresh package archives, check PACKAGE presence,
-     install if it's not installed and load package."""
+  "Refresh package archives, check PACKAGE presence, install if it's not installed and load package."
      (if (null (require package nil t))
          (progn (let* ((ARCHIVES (if (null package-archive-contents)
                                      (progn (package-refresh-contents)
@@ -90,7 +89,7 @@
 (setq-default indent-tabs-mode nil)
 
 ;; Require newline at end of file
-(setq require-final-newline t)
+(setq require-final-newline nil)
 
 ;; Unbind suspend-frame binds
 (global-unset-key (kbd "C-z"))
@@ -151,21 +150,35 @@
         sml/col-number-format "%c")
   (add-hook 'after-init-hook #'sml/setup))
 
-(req-package helm
-  :diminish helm-mode
-  :chords (("xx"  . helm-M-x))
-  :bind (("M-x" . helm-M-x)
-         ("C-x b" . helm-mini)
-         ("C-x C-b" . helm-buffers-list)
-         ("C-x C-f" . helm-find-files)
-         ("M-i" . helm-semantic-or-imenu))
-  :config
-  (helm-mode 1)
-  (setq helm-split-window-in-side-p           t
-        helm-buffers-fuzzy-matching           t
-        helm-move-to-line-cycle-in-source     t
-        helm-ff-search-library-in-sexp        t
-        helm-ff-file-name-history-use-recentf t))
+;; (req-package helm
+;;   :diminish helm-mode
+;;   :chords (("xx"  . helm-M-x))
+;;   :bind (("M-x" . helm-M-x)
+;;          ("C-x b" . helm-mini)
+;;          ("C-x C-b" . helm-buffers-list)
+;;          ("C-x C-f" . helm-find-files)
+;;          ("M-i" . helm-semantic-or-imenu))
+;;   :config
+;;   (helm-mode 1)
+;;   (setq helm-split-window-in-side-p           t
+;;         helm-buffers-fuzzy-matching           t
+;;         helm-move-to-line-cycle-in-source     t
+;;         helm-ff-search-library-in-sexp        t
+;;         helm-ff-file-name-history-use-recentf t))
+
+;; (req-package helm-projectile
+;;   :require projectile
+;;   :config
+;;   (message "HELM-PROJECTILE")
+;;   (helm-projectile-on))
+
+;; (req-package helm-ag)
+
+;; (req-package helm-flycheck
+;;   :require helm
+;;   :config
+;;   (define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck)
+;; )
 
 (req-package exec-path-from-shell
   :config
@@ -174,12 +187,6 @@
     (exec-path-from-shell-initialize)))
 
 (req-package eshell-z)
-
-(req-package helm-flycheck
-  :require helm
-  :config
-  (define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck))
-
 (req-package flx-ido)
 (req-package ag)
 
@@ -191,15 +198,9 @@
   :init
   (setq projectile-known-projects-file (expand-file-name "projectile-bookmarks.cache" savefile-dir))
   :config
-  (projectile-mode))
-
-;; (req-package helm-projectile
-;;   :require projectile
-;;   :config
-;;   (message "HELM-PROJECTILE")
-;;   (helm-projectile-on))
-
-(req-package helm-ag)
+  (projectile-mode)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (setq projectile-globally-ignored-file-suffixes (list ".meta")))
 
 (req-package magit
   :bind (("C-x g" . magit-status)))
@@ -410,6 +411,8 @@
 
 (req-package graphviz-dot-mode)
 
+(req-package csharp-mode)
+
 (req-package omnisharp
   :require company flycheck
   :config
@@ -425,37 +428,135 @@
   :config
   (add-hook 'c++-mode-hook #'modern-c++-font-lock-mode))
 
+(req-package typescript)
+
 (req-package clang-format
   :config
-  (fset 'c-indent-region 'clang-format-region))
+  (add-hook 'c++-mode-hook (lambda ()
+                             (fset 'c-indent-region 'clang-format-region))))
 
+(req-package editorconfig
+  :config
+  (editorconfig-mode 1))
+
+
+(req-package tide
+  :config
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    ;; company is an optional dependency. You have to
+    ;; install it separately via package-install
+    ;; `M-x package-install [ret] company`
+    (company-mode +1))
+
+  ;; aligns annotation to the right hand side
+  (setq company-tooltip-align-annotations t)
+
+  ;; formats the buffer before saving
+  (add-hook 'before-save-hook 'tide-format-before-save)
+
+  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+
+(req-package lsp-mode)
+
+(req-package json-mode)
+
+(defun ivy-open-json-file-action (file)
+  "Read a file, FILE, as json in temp buffer."
+  (progn
+    (switch-to-buffer (make-temp-name "json"))
+    (json-mode)
+    (let ((json-encoding-pretty-print t))
+    (insert (json-encode (json-read-file file))))))
+
+(req-package counsel
+  :chords (("xx"  . counsel-M-x))
+  :bind (("M-x" . counsel-M-x)
+         ("C-c r" . ivy-resume)
+         ("C-x b" . ivy-switch-buffer)
+         ("C-x C-b" . counsel-switch-buffer)
+         ("C-x C-f" . counsel-find-file)
+         ("M-i" . counsel-semantic-or-imenu)
+         ("C-s" . swiper-isearch)
+         ("C-r" . swiper-isearch)
+         ("C-h f" . counsel-describe-function)
+         ("C-h v" . counsel-describe-variable)
+         ("C-h s" . counsel-descbinds)
+         ("C-c c" . counsel-compile)
+         ("C-'" . avy-goto-line))
+  :config
+  (setq ivy-use-virtual-buffers t)
+  ;;(setq ivy-count-format "(%d/%d) ")
+  (setq ivy-count-format "")
+  (define-key swiper-map (kbd "C-r") 'ivy-previous-line)
+  (ivy-set-actions 'counsel-find-file '(("j" ivy-open-json-file-action "json"))))
+
+(req-package counsel-projectile
+  :require counsel projectile
+  :config
+  (counsel-projectile-mode)
+  (setq projectile-completion-system 'ivy))
+
+(req-package magit-circleci
+  :config
+  (setq magit-circleci-token "08e48cd9dfd15664991c889d8f7db8061c0f72ef"))
 
 (req-package-finish)
 
 (quelpa '(reason-mode :repo "reasonml-editor/reason-mode" :fetcher github :stable t))
 
 (defun shell-cmd (cmd)
-  "Returns the stdout output of a shell command or nil if the command returned
-   an error"
-  (car (ignore-errors (apply 'process-lines (split-string cmd)))))
+ "Return the stdout output of a shell command CMD or nil if the command returned an error."
+ (car (ignore-errors (apply 'process-lines (split-string cmd)))))
 
 (let* ((refmt-bin (shell-cmd "refmt ----where"))
-       (merlin-bin (shell-cmd "ocamlmerlin ----where"))
-       (merlin-base-dir (when merlin-bin
-                          (replace-regexp-in-string "bin/ocamlmerlin$" "" merlin-bin))))
-  ;; Add npm merlin.el to the emacs load path and tell emacs where to find ocamlmerlin
-  (when merlin-bin
-    (add-to-list 'load-path (concat merlin-base-dir "share/emacs/site-lisp/"))
-    (setq merlin-command merlin-bin))
+      (merlin-bin (shell-cmd "ocamlmerlin ----where"))
+      (merlin-base-dir (when merlin-bin
+                         (replace-regexp-in-string "bin/ocamlmerlin$" "" merlin-bin))))
+ ;; Add npm merlin.el to the emacs load path and tell emacs where to find ocamlmerlin
+ (when merlin-bin
+   (add-to-list 'load-path (concat merlin-base-dir "share/emacs/site-lisp/"))
+   (setq merlin-command merlin-bin))
 
   (when refmt-bin
-    (setq refmt-command refmt-bin)))
+   (setq refmt-command refmt-bin)))
 
 (require 'reason-mode)
 (require 'merlin)
 (add-hook 'reason-mode-hook (lambda ()
-                              (add-hook 'before-save-hook 'refmt-before-save)
-                              (merlin-mode)))
+                             (add-hook 'before-save-hook 'refmt-before-save)
+                             (merlin-mode)
+                             (define-key reason-mode-map (kbd "M-.") 'merlin-locate)
+                             (define-key reason-mode-map (kbd "M-,") 'merlin-pop-stack)
+                             ))
 (setq merlin-ac-setup t)
 
+(defun toggle-window-dedicated ()
+  "Control whether or not Emacs is allowed to display another buffer in current window."
+  (interactive)
+  (message
+   (if (let (window (get-buffer-window (current-buffer)))
+         (set-window-dedicated-p window (not (window-dedicated-p window))))
+       "%s: Can't touch this!"
+     "%s is up for grabs.")
+   (current-buffer)))
+
+(global-set-key (kbd "C-c t") 'toggle-window-dedicated)
+(global-set-key (kbd "C-c C-c") 'compile)
+
 (find-file "~/.emacs.d/init.el")
+
+
+(defun steinn/paste-json ()
+  "Foobar."
+  (interactive)
+  (let ((json-encoding-pretty-print t))
+    (insert (json-encode (json-read-from-string (substring-no-properties (current-kill 0)))))))
+
+(provide 'init)
+;;; init.el ends here

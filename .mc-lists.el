@@ -4,6 +4,8 @@
 (setq mc/cmds-to-run-for-all
       '(
         c-electric-delete-forward
+        c-electric-semi&comma
+        c-electric-star
         delete-window
         electric-newline-and-maybe-indent
         helm-M-x
@@ -11,11 +13,14 @@
         org-end-of-line
         org-force-self-insert
         org-self-insert-command
+        swiper-mc
         ))
 
 (setq mc/cmds-to-run-once
       '(
+        c-electric-paren
         end-of-buffer
         kill-region
+        omnisharp-add-dot-and-auto-complete
         yaml-electric-backspace
         ))
