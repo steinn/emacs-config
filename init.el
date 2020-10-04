@@ -123,12 +123,12 @@
 
 (setq custom-file (expand-file-name "custom.el" init-dir))
 
-(require 'ansi-color)
-(defun colorize-compilation-buffer ()
-  (toggle-read-only)
-  (ansi-color-apply-on-region compilation-filter-start (point))
-  (toggle-read-only))
-(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+;; (require 'ansi-color)
+;; (defun colorize-compilation-buffer ()
+;;   (toggle-read-only)
+;;   (ansi-color-apply-on-region compilation-filter-start (point))
+;;   (toggle-read-only))
+;; (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
 ;;
 ;; Setup packages
@@ -186,6 +186,30 @@
     (add-to-list 'exec-path-from-shell-variables "ANDROID_HOME")
     (exec-path-from-shell-initialize)))
 
+(req-package xterm-color
+  :config
+  (setq comint-output-filter-functions
+        (remove 'ansi-color-process-output comint-output-filter-functions))
+  (add-hook 'shell-mode-hook
+            (lambda ()
+              ;; Disable font-locking in this buffer to improve performance
+              (font-lock-mode -1)
+              ;; Prevent font-locking from being re-enabled in this buffer
+              (make-local-variable 'font-lock-function)
+              (setq font-lock-function (lambda (_) nil))
+              (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t))))
+
+(req-package eshell
+  :require xterm-color
+  :config
+  (add-hook 'eshell-before-prompt-hook
+            (lambda ()
+              (setq xterm-color-preserve-properties t)))
+  (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+  (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
+  (setenv "TERM" "xterm-256color")
+  )
+
 (req-package eshell-z)
 (req-package flx-ido)
 (req-package ag)
@@ -200,7 +224,16 @@
   :config
   (projectile-mode)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (setq projectile-globally-ignored-file-suffixes (list ".meta")))
+
+  (setq projectile-indexing-method 'alien)
+  (setq projectile-sort-order 'recently-active)
+  (setq projectile-globally-ignored-file-suffixes '("*.meta" "*.bs.js"))
+  (setq projectile-globally-ignored-directories '(
+                                                 ".idea" ".ensime_cache" ".eunit"
+                                                 ".git" ".hg" ".fslckout" "_FOSSIL_"
+                                                 ".bzr" "_darcs" ".tox" ".svn" ".stack-work"
+                                                 "node_modules"))
+  )
 
 (req-package magit
   :bind (("C-x g" . magit-status)))
@@ -438,7 +471,7 @@
 (req-package editorconfig
   :config
   (editorconfig-mode 1))
-
+(omnisharp-start-omnisharp-server)
 
 (req-package tide
   :config
@@ -462,7 +495,15 @@
 
   (add-hook 'typescript-mode-hook #'setup-tide-mode))
 
-(req-package lsp-mode)
+;; (req-package lsp-mode
+;;   :config
+;;   (lsp-register-client
+;;    (make-lsp-client :new-connection (lsp-stdio-connection "/Users/steinn/.emacs.d/reason/reason-language-server")
+;;                     :major-modes '(reason-mode)
+;;                     :notification-handlers (ht ("client/registerCapability" 'ignore))
+;;                     :priority 1
+;;                     :server-id 'reason-ls)))
+
 
 (req-package json-mode)
 
@@ -506,6 +547,47 @@
   :config
   (setq magit-circleci-token "08e48cd9dfd15664991c889d8f7db8061c0f72ef"))
 
+(req-package glsl-mode)
+
+(req-package company
+  :config
+  (global-company-mode))
+
+
+;; (req-package org-mode
+;;   :config
+
+;;   )
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((dot . t)))
+
+(req-package org-roam
+      :hook
+      (after-init . org-roam-mode)
+      :custom
+      (org-roam-directory (substitute-in-file-name "$HOME/org-roam"))
+      :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n g" . org-roam-show-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))))
+
+(req-package ediff
+  :config
+  (defvar my-ediff-last-windows nil)
+
+  (defun my-store-pre-ediff-winconfig ()
+    (setq my-ediff-last-windows (current-window-configuration)))
+
+  (defun my-restore-pre-ediff-winconfig ()
+    (set-window-configuration my-ediff-last-windows))
+
+  (add-hook 'ediff-before-setup-hook #'my-store-pre-ediff-winconfig)
+  (add-hook 'ediff-quit-hook #'my-restore-pre-ediff-winconfig))
+
 (req-package-finish)
 
 (quelpa '(reason-mode :repo "reasonml-editor/reason-mode" :fetcher github :stable t))
@@ -526,6 +608,9 @@
   (when refmt-bin
    (setq refmt-command refmt-bin)))
 
+
+;; (setq refmt-command "/Users/steinn/work/teatimegames/node_modules/bs-platform/bsrefmt")
+
 (require 'reason-mode)
 (require 'merlin)
 (add-hook 'reason-mode-hook (lambda ()
@@ -534,7 +619,8 @@
                              (define-key reason-mode-map (kbd "M-.") 'merlin-locate)
                              (define-key reason-mode-map (kbd "M-,") 'merlin-pop-stack)
                              ))
-(setq merlin-ac-setup t)
+(require 'merlin-company)
+;; (setq merlin-ac-setup t)
 
 (defun toggle-window-dedicated ()
   "Control whether or not Emacs is allowed to display another buffer in current window."
@@ -558,5 +644,16 @@
   (let ((json-encoding-pretty-print t))
     (insert (json-encode (json-read-from-string (substring-no-properties (current-kill 0)))))))
 
+(defun steinn/clear-buffer-and-paste-json ()
+  "Foobar."
+  (interactive)
+  (let ((json-encoding-pretty-print t))
+    (erase-buffer)
+    (insert (json-encode (json-read-from-string (substring-no-properties (current-kill 0)))))))
+
 (provide 'init)
 ;;; init.el ends here
+(put 'narrow-to-region 'disabled nil)
+(put 'set-goal-column 'disabled nil)
+(put 'narrow-to-page 'disabled nil)
+(put 'upcase-region 'disabled nil)

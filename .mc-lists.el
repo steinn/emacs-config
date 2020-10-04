@@ -18,6 +18,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        ace-window
         c-electric-paren
         end-of-buffer
         kill-region
