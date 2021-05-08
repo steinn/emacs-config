@@ -6,18 +6,17 @@
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
-                         ("melpa-stable" . "https://stable.melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")))
+                         ("org" . "https://orgmode.org/elpa/")))
+
 (package-initialize)
 
 
 ;; setup quelpa
-(if (require 'quelpa nil t)
-   (quelpa-self-upgrade)
- (with-temp-buffer
-   (url-insert-file-contents "https://raw.github.com/quelpa/quelpa/master/bootstrap.el")
-   (eval-buffer)))
+(unless (package-installed-p 'quelpa)
+    (with-temp-buffer
+      (url-insert-file-contents "https://github.com/quelpa/quelpa/raw/master/quelpa.el")
+      (eval-buffer)
+      (quelpa-self-upgrade)))
 
 ;; emacs server
 (require 'server)
@@ -418,15 +417,6 @@
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-jsx-mode))
   (setq js-indent-level 2))
 
-(req-package prettier-js
-  :require js2-mode
-  :config
-  (add-hook 'js2-mode-hook 'prettier-js-mode)
-  (setq prettier-js-args '("--single-quote"
-                           "--trailing-comma" "es5"
-                           "--bracket-spacing" "false"
-                           "--parser" "flow")))
-
 (req-package multiple-cursors
   :config
   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
@@ -461,8 +451,6 @@
   :config
   (add-hook 'c++-mode-hook #'modern-c++-font-lock-mode))
 
-(req-package typescript)
-
 (req-package clang-format
   :config
   (add-hook 'c++-mode-hook (lambda ()
@@ -473,7 +461,20 @@
   (editorconfig-mode 1))
 (omnisharp-start-omnisharp-server)
 
+(req-package typescript)
+
+(req-package prettier-js
+  :require js2-mode
+  :config
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  ;; (setq prettier-js-args '("--single-quote"
+  ;;                          "--trailing-comma" "es5"
+  ;;                          "--bracket-spacing" "false"
+  ;;                          "--parser" "flow"))
+  )
+
 (req-package tide
+  :require prettier-js
   :config
   (defun setup-tide-mode ()
     (interactive)
@@ -482,18 +483,26 @@
     (setq flycheck-check-syntax-automatically '(save mode-enabled))
     (eldoc-mode +1)
     (tide-hl-identifier-mode +1)
-    ;; company is an optional dependency. You have to
-    ;; install it separately via package-install
-    ;; `M-x package-install [ret] company`
-    (company-mode +1))
+    (company-mode +1)
+    (prettier-js-mode +1))
 
   ;; aligns annotation to the right hand side
   (setq company-tooltip-align-annotations t)
 
-  ;; formats the buffer before saving
-  (add-hook 'before-save-hook 'tide-format-before-save)
+  ;; don't use tide formatting, use prettier to format
+  ;; (add-hook 'before-save-hook 'tide-format-before-save)
 
   (add-hook 'typescript-mode-hook #'setup-tide-mode))
+
+(req-package web-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (setup-tide-mode))))
+  ;; enable typescript-tslint checker
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 ;; (req-package lsp-mode
 ;;   :config
@@ -567,13 +576,23 @@
       :hook
       (after-init . org-roam-mode)
       :custom
-      (org-roam-directory (substitute-in-file-name "$HOME/org-roam"))
+      (org-roam-directory (substitute-in-file-name "$HOME/org/roam"))
       :bind (:map org-roam-mode-map
               (("C-c n l" . org-roam)
                ("C-c n f" . org-roam-find-file)
-               ("C-c n g" . org-roam-show-graph))
+               ("C-c n g" . org-roam-show-graph)
+               ("C-c n c" . org-roam-dailies-capture-today))
               :map org-mode-map
-              (("C-c n i" . org-roam-insert))))
+              (("C-c n i" . org-roam-insert)))
+      :config
+      (setq org-roam-dailies-directory "daily/")
+      (setq org-roam-dailies-capture-templates
+      '(("d" "default" entry
+         #'org-roam-capture--get-point
+         "* %?"
+         :file-name "daily/%<%Y-%m-%d>"
+         :head "#+title: %<%Y-%m-%d>\n\n")))
+      )
 
 (req-package ediff
   :config
@@ -618,6 +637,7 @@
                              (merlin-mode)
                              (define-key reason-mode-map (kbd "M-.") 'merlin-locate)
                              (define-key reason-mode-map (kbd "M-,") 'merlin-pop-stack)
+                             (modify-syntax-entry ?\{ "(}" table)
                              ))
 (require 'merlin-company)
 ;; (setq merlin-ac-setup t)
