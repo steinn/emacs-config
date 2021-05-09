@@ -562,12 +562,6 @@
   :config
   (global-company-mode))
 
-
-;; (req-package org-mode
-;;   :config
-
-;;   )
-
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot . t)))
