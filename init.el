@@ -122,13 +122,6 @@
 
 (setq custom-file (expand-file-name "custom.el" init-dir))
 
-;; (require 'ansi-color)
-;; (defun colorize-compilation-buffer ()
-;;   (toggle-read-only)
-;;   (ansi-color-apply-on-region compilation-filter-start (point))
-;;   (toggle-read-only))
-;; (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-
 ;;
 ;; Setup packages
 ;;
@@ -149,65 +142,35 @@
         sml/col-number-format "%c")
   (add-hook 'after-init-hook #'sml/setup))
 
-;; (req-package helm
-;;   :diminish helm-mode
-;;   :chords (("xx"  . helm-M-x))
-;;   :bind (("M-x" . helm-M-x)
-;;          ("C-x b" . helm-mini)
-;;          ("C-x C-b" . helm-buffers-list)
-;;          ("C-x C-f" . helm-find-files)
-;;          ("M-i" . helm-semantic-or-imenu))
-;;   :config
-;;   (helm-mode 1)
-;;   (setq helm-split-window-in-side-p           t
-;;         helm-buffers-fuzzy-matching           t
-;;         helm-move-to-line-cycle-in-source     t
-;;         helm-ff-search-library-in-sexp        t
-;;         helm-ff-file-name-history-use-recentf t))
-
-;; (req-package helm-projectile
-;;   :require projectile
-;;   :config
-;;   (message "HELM-PROJECTILE")
-;;   (helm-projectile-on))
-
-;; (req-package helm-ag)
-
-;; (req-package helm-flycheck
-;;   :require helm
-;;   :config
-;;   (define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck)
-;; )
-
 (req-package exec-path-from-shell
   :config
   (when (memq window-system '(mac ns x))
     (add-to-list 'exec-path-from-shell-variables "ANDROID_HOME")
     (exec-path-from-shell-initialize)))
 
-(req-package xterm-color
-  :config
-  (setq comint-output-filter-functions
-        (remove 'ansi-color-process-output comint-output-filter-functions))
-  (add-hook 'shell-mode-hook
-            (lambda ()
-              ;; Disable font-locking in this buffer to improve performance
-              (font-lock-mode -1)
-              ;; Prevent font-locking from being re-enabled in this buffer
-              (make-local-variable 'font-lock-function)
-              (setq font-lock-function (lambda (_) nil))
-              (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t))))
+;; (req-package xterm-color
+;;   :config
+;;   (setq comint-output-filter-functions
+;;         (remove 'ansi-color-process-output comint-output-filter-functions))
+;;   (add-hook 'shell-mode-hook
+;;             (lambda ()
+;;               ;; Disable font-locking in this buffer to improve performance
+;;               (font-lock-mode -1)
+;;               ;; Prevent font-locking from being re-enabled in this buffer
+;;               (make-local-variable 'font-lock-function)
+;;               (setq font-lock-function (lambda (_) nil))
+;;               (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t))))
 
-(req-package eshell
-  :require xterm-color
-  :config
-  (add-hook 'eshell-before-prompt-hook
-            (lambda ()
-              (setq xterm-color-preserve-properties t)))
-  (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
-  (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
-  (setenv "TERM" "xterm-256color")
-  )
+;; (req-package eshell
+;;   :require xterm-color
+;;   :config
+;;   (add-hook 'eshell-before-prompt-hook
+;;             (lambda ()
+;;               (setq xterm-color-preserve-properties t)))
+;;   (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+;;   (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
+;;   (setenv "TERM" "xterm-256color")
+;;   )
 
 (req-package eshell-z)
 (req-package flx-ido)
@@ -283,13 +246,6 @@
   ;; color highlight parenthesis according to depth
   :config
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
-
-;; (req-package uniquify
-;;   :config
-;;   (setq uniquify-buffer-name-style 'forward
-;;         uniquify-separator "/"
-;;         uniquify-after-kill-buffer-p t     ; rename after killing uniquified
-;;         uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
 
 (req-package saveplace
   :config
@@ -406,9 +362,7 @@
   )
 
 ;; python
-(req-package python-mode
-  :config
-  (addv-to-list 'auto-mode-alist '("BUILD" . python-mode)))
+(req-package python-mode)
 
 (req-package js2-mode
   :require flycheck
@@ -436,15 +390,15 @@
 
 (req-package csharp-mode)
 
-(req-package omnisharp
-  :require company flycheck
-  :config
-  (add-hook 'csharp-mode-hook 'omnisharp-mode)
-  (add-to-list 'company-backends 'company-omnisharp)
-  (define-key omnisharp-mode-map (kbd ".") 'omnisharp-add-dot-and-auto-complete)
-  (define-key omnisharp-mode-map (kbd "<M-SPC>") 'omnisharp-auto-complete)
-  (define-key omnisharp-mode-map (kbd "M-.") 'omnisharp-go-to-definition)
-  (setq c-basic-offset 2))
+;; (req-package omnisharp
+;;   :require company flycheck
+;;   :config
+;;   (add-hook 'csharp-mode-hook 'omnisharp-mode)
+;;   (add-to-list 'company-backends 'company-omnisharp)
+;;   (define-key omnisharp-mode-map (kbd ".") 'omnisharp-add-dot-and-auto-complete)
+;;   (define-key omnisharp-mode-map (kbd "<M-SPC>") 'omnisharp-auto-complete)
+;;   (define-key omnisharp-mode-map (kbd "M-.") 'omnisharp-go-to-definition)
+;;   (setq c-basic-offset 2))
 
 
 (req-package modern-cpp-font-lock
@@ -459,50 +413,49 @@
 (req-package editorconfig
   :config
   (editorconfig-mode 1))
-(omnisharp-start-omnisharp-server)
 
-(req-package typescript)
+;; (req-package typescript)
 
-(req-package prettier-js
-  :require js2-mode
-  :config
-  (add-hook 'js2-mode-hook 'prettier-js-mode)
-  ;; (setq prettier-js-args '("--single-quote"
-  ;;                          "--trailing-comma" "es5"
-  ;;                          "--bracket-spacing" "false"
-  ;;                          "--parser" "flow"))
-  )
+;; (req-package prettier-js
+;;   :require js2-mode
+;;   :config
+;;   (add-hook 'js2-mode-hook 'prettier-js-mode)
+;;   ;; (setq prettier-js-args '("--single-quote"
+;;   ;;                          "--trailing-comma" "es5"
+;;   ;;                          "--bracket-spacing" "false"
+;;   ;;                          "--parser" "flow"))
+;;   )
 
-(req-package tide
-  :require prettier-js
-  :config
-  (defun setup-tide-mode ()
-    (interactive)
-    (tide-setup)
-    (flycheck-mode +1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (eldoc-mode +1)
-    (tide-hl-identifier-mode +1)
-    (company-mode +1)
-    (prettier-js-mode +1))
+;; (req-package tide
+;;   :require prettier-js
+;;   :config
+;;   (defun setup-tide-mode ()
+;;     (interactive)
+;;     (tide-setup)
+;;     (flycheck-mode +1)
+;;     (setq flycheck-check-syntax-automatically '(save mode-enabled))
+;;     (eldoc-mode +1)
+;;     (tide-hl-identifier-mode +1)
+;;     (company-mode +1)
+;;     (prettier-js-mode +1))
 
-  ;; aligns annotation to the right hand side
-  (setq company-tooltip-align-annotations t)
+;;   ;; aligns annotation to the right hand side
+;;   (setq company-tooltip-align-annotations t)
 
-  ;; don't use tide formatting, use prettier to format
-  ;; (add-hook 'before-save-hook 'tide-format-before-save)
+;;   ;; don't use tide formatting, use prettier to format
+;;   ;; (add-hook 'before-save-hook 'tide-format-before-save)
 
-  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+;;   (add-hook 'typescript-mode-hook #'setup-tide-mode))
 
-(req-package web-mode
-  :config
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-  (add-hook 'web-mode-hook
-            (lambda ()
-              (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
-  ;; enable typescript-tslint checker
-  (flycheck-add-mode 'typescript-tslint 'web-mode))
+;; (req-package web-mode
+;;   :config
+;;   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+;;   (add-hook 'web-mode-hook
+;;             (lambda ()
+;;               (when (string-equal "tsx" (file-name-extension buffer-file-name))
+;;                 (setup-tide-mode))))
+;;   ;; enable typescript-tslint checker
+;;   (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 ;; (req-package lsp-mode
 ;;   :config
@@ -552,9 +505,9 @@
   (counsel-projectile-mode)
   (setq projectile-completion-system 'ivy))
 
-(req-package magit-circleci
-  :config
-  (setq magit-circleci-token "08e48cd9dfd15664991c889d8f7db8061c0f72ef"))
+;; (req-package magit-circleci
+;;   :config
+;;   (setq magit-circleci-token "08e48cd9dfd15664991c889d8f7db8061c0f72ef"))
 
 (req-package glsl-mode)
 
@@ -603,39 +556,6 @@
 
 (req-package-finish)
 
-(quelpa '(reason-mode :repo "reasonml-editor/reason-mode" :fetcher github :stable t))
-
-(defun shell-cmd (cmd)
- "Return the stdout output of a shell command CMD or nil if the command returned an error."
- (car (ignore-errors (apply 'process-lines (split-string cmd)))))
-
-(let* ((refmt-bin (shell-cmd "refmt ----where"))
-      (merlin-bin (shell-cmd "ocamlmerlin ----where"))
-      (merlin-base-dir (when merlin-bin
-                         (replace-regexp-in-string "bin/ocamlmerlin$" "" merlin-bin))))
- ;; Add npm merlin.el to the emacs load path and tell emacs where to find ocamlmerlin
- (when merlin-bin
-   (add-to-list 'load-path (concat merlin-base-dir "share/emacs/site-lisp/"))
-   (setq merlin-command merlin-bin))
-
-  (when refmt-bin
-   (setq refmt-command refmt-bin)))
-
-
-;; (setq refmt-command "/Users/steinn/work/teatimegames/node_modules/bs-platform/bsrefmt")
-
-(require 'reason-mode)
-(require 'merlin)
-(add-hook 'reason-mode-hook (lambda ()
-                             (add-hook 'before-save-hook 'refmt-before-save)
-                             (merlin-mode)
-                             (define-key reason-mode-map (kbd "M-.") 'merlin-locate)
-                             (define-key reason-mode-map (kbd "M-,") 'merlin-pop-stack)
-                             (modify-syntax-entry ?\{ "(}" table)
-                             ))
-(require 'merlin-company)
-;; (setq merlin-ac-setup t)
-
 (defun toggle-window-dedicated ()
   "Control whether or not Emacs is allowed to display another buffer in current window."
   (interactive)
@@ -666,6 +586,7 @@
     (insert (json-encode (json-read-from-string (substring-no-properties (current-kill 0)))))))
 
 (provide 'init)
+
 ;;; init.el ends here
 (put 'narrow-to-region 'disabled nil)
 (put 'set-goal-column 'disabled nil)
