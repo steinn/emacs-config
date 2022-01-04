@@ -3,6 +3,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        beginning-of-buffer
         c-electric-delete-forward
         c-electric-semi&comma
         c-electric-star
@@ -21,7 +22,9 @@
         ace-window
         c-electric-paren
         end-of-buffer
+        ivy-switch-buffer
         kill-region
+        magit-next-line
         omnisharp-add-dot-and-auto-complete
         yaml-electric-backspace
         ))

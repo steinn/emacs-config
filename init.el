@@ -1,7 +1,6 @@
 ;;; package --- ..
 ;;; Commentary:
 ;;; Code:
-
 ;; elpa
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -10,18 +9,10 @@
 
 (package-initialize)
 
-
-;; setup quelpa
-(unless (package-installed-p 'quelpa)
-    (with-temp-buffer
-      (url-insert-file-contents "https://github.com/quelpa/quelpa/raw/master/quelpa.el")
-      (eval-buffer)
-      (quelpa-self-upgrade)))
-
 ;; emacs server
-(require 'server)
-(unless (server-running-p)
-  (server-start))
+;; (require 'server)
+;; (unless (server-running-p)
+;;   (server-start))
 
 (defun require-package (package)
   "Refresh package archives, check PACKAGE presence, install if it's not installed and load package."
@@ -34,7 +25,6 @@
                   (if AVAIL
                       (package-install package)))
                 (require package))))
-
 
 ;; setup req-package
 (require-package 'use-package)
@@ -199,6 +189,7 @@
 
 (req-package magit
   :bind (("C-x g" . magit-status)))
+(req-package forge)
 
 (req-package whitespace
   :diminish whitespace-mode
@@ -215,17 +206,6 @@
               (add-hook 'before-save-hook #'whitespace-cleanup nil t)
               )))
 
-
-;; Can't use this with company mode because the pop-up is rendered
-;; incorrectly because of this mode.
-;; (req-package fill-column-indicator
-;;   :config
-;;   (setq fci-rule-column 80)
-;;   (add-hook 'prog-mode-hook
-;;             (lambda () (fci-mode 1)))
-;;   (add-hook 'text-mode-hook
-;;             (lambda () (fci-mode 1))))
-
 (req-package ace-window
   :bind (("M-o" . ace-window)))
 
@@ -237,7 +217,6 @@
         sp-autoskip-closing-pair 'always
         sp-hybrid-kill-entire-symbol nil)
   (sp-use-smartparens-bindings)
-  ;; (sp-use-paredit-bindings)
   (show-smartparens-global-mode +1)
   (add-hook 'prog-mode-hook
             (lambda () (smartparens-mode +1))))
@@ -373,17 +352,9 @@
   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
 
 (req-package yaml-mode)
-(req-package markdown-mode)
-
-;; (req-package zoom-frm
-;;   :config
-;;   (global-set-key (kbd "C-+") 'zoom-frm-in)
-;;   (global-set-key (kbd "C--") 'zoom-frm-out))
-
-(req-package graphviz-dot-mode)
-
-(req-package csharp-mode)
-
+;; (req-package markdown-mode)
+;; (req-package graphviz-dot-mode)
+;; (req-package csharp-mode)
 ;; (req-package omnisharp
 ;;   :require company flycheck
 ;;   :config
@@ -393,7 +364,6 @@
 ;;   (define-key omnisharp-mode-map (kbd "<M-SPC>") 'omnisharp-auto-complete)
 ;;   (define-key omnisharp-mode-map (kbd "M-.") 'omnisharp-go-to-definition)
 ;;   (setq c-basic-offset 2))
-
 
 (req-package modern-cpp-font-lock
   :config
@@ -408,22 +378,13 @@
   :config
   (editorconfig-mode 1))
 
-;; (req-package js2-mode
-;;   :require flycheck
-;;   :config
-;;   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-jsx-mode))
-;;   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-jsx-mode))
-;;   (setq js-indent-level 2))
 (req-package rjsx-mode)
-
-;; (req-package typescript)
-
 (req-package prettier
   :config
-  (add-hook 'js2-mode-hook 'prettier-js-mode))
+  (add-hook 'js2-mode-hook 'prettier-mode))
 
 (req-package tide
-  :require prettier-js
+  :require prettier
   :config
   (defun setup-tide-mode ()
     (interactive)
@@ -452,15 +413,6 @@
                 (setup-tide-mode))))
   ;; enable typescript-tslint checker
   (flycheck-add-mode 'typescript-tslint 'web-mode))
-
-;; (req-package lsp-mode
-;;   :config
-;;   (lsp-register-client
-;;    (make-lsp-client :new-connection (lsp-stdio-connection "/Users/steinn/.emacs.d/reason/reason-language-server")
-;;                     :major-modes '(reason-mode)
-;;                     :notification-handlers (ht ("client/registerCapability" 'ignore))
-;;                     :priority 1
-;;                     :server-id 'reason-ls)))
 
 
 (req-package json-mode)
@@ -501,10 +453,6 @@
   (counsel-projectile-mode)
   (setq projectile-completion-system 'ivy))
 
-;; (req-package magit-circleci
-;;   :config
-;;   (setq magit-circleci-token "08e48cd9dfd15664991c889d8f7db8061c0f72ef"))
-
 (req-package glsl-mode)
 
 (req-package company
@@ -514,28 +462,6 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot . t)))
-
-(req-package org-roam
-      :hook
-      (after-init . org-roam-mode)
-      :custom
-      (org-roam-directory (substitute-in-file-name "$HOME/org/roam"))
-      :bind (:map org-roam-mode-map
-              (("C-c n l" . org-roam)
-               ("C-c n f" . org-roam-find-file)
-               ("C-c n g" . org-roam-show-graph)
-               ("C-c n c" . org-roam-dailies-capture-today))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert)))
-      :config
-      (setq org-roam-dailies-directory "daily/")
-      (setq org-roam-dailies-capture-templates
-      '(("d" "default" entry
-         #'org-roam-capture--get-point
-         "* %?"
-         :file-name "daily/%<%Y-%m-%d>"
-         :head "#+title: %<%Y-%m-%d>\n\n")))
-      )
 
 (req-package ediff
   :config
@@ -588,3 +514,4 @@
 (put 'set-goal-column 'disabled nil)
 (put 'narrow-to-page 'disabled nil)
 (put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
