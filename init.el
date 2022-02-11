@@ -393,6 +393,7 @@
     (setq flycheck-check-syntax-automatically '(save mode-enabled))
     (eldoc-mode +1)
     (tide-hl-identifier-mode +1)
+    (setq tide-always-show-documentation t)
     (company-mode +1)
     (prettier-mode +1))
 
