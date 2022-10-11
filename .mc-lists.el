@@ -15,6 +15,7 @@
         org-force-self-insert
         org-self-insert-command
         swiper-mc
+        yaml-electric-dash-and-dot
         ))
 
 (setq mc/cmds-to-run-once
